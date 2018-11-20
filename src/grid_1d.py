@@ -46,11 +46,20 @@ class Grid1d( object ):
 class Grid1d_Euler( Grid1d ):
     def __init__( self , N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow' ):
         super().__init__(N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow')
-        self.U = np.zeros( (3 , N + 2 * Ng ) , dtype=np.float64 )
-        self.W = np.zeros( (3 , N + 2 * Ng ) , dtype=np.float64 )
+        self.WRHO = 0
+        self.URHO = 0
+        self.WV   = 1
+        self.URHOV= 1
+        self.WP   = 2
+        self.UENER= 2
+        self.NVAR = 3
+        self.U = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
+        self.W = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
+
     def get_scratch_array( self ):
-        return( np.zeros( (3, self.N + 2 * self.Ng ) , dtype=np.float64 ) )
-    def fill_BCs( self ):
+        return( np.zeros( (self.NVAR, self.N + 2 * self.Ng ) , dtype=np.float64 ) )
+
+    def fill_BCs( self , U ):
         """ fill ghostcells """
         if self.bc == "periodic":
             # left boundary

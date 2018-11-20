@@ -49,6 +49,17 @@ class Simulation( object ):
                 max( abs( self.grid.U[ 1 , self.grid.ilo :\
                 self.grid.ihi + 1 ] ) ) )
 
+    def cons_to_prim( self , U ):
+        q = self.g.get_scratch_array()
+        gamma = self.params['gamma']
+
+        q[ : , QRHO] = U[:, URHO]
+        q[ : , QU]   = U[:, UMX] / U[: , URHO]
+        q[ : , QP]   = (U[:, UENER] - 0.5 * q[ :,QRHO] *\
+                        q[:,QU]**2) * (gamma - 1.0 )
+
+        return q
+
     def states( self , dt ):
         """ reconstruct left and right interface states 
             implemented:
@@ -64,7 +75,6 @@ class Simulation( object ):
 
         # compute piecewise linear slopes -- 2nd order MC limiter
         # pick a range of cells that includes 1 ghost cell on either side 
-        ib = g.ilo - 1
         ie = g.ihi + 1
 
         U = g.U
@@ -73,9 +83,9 @@ class Simulation( object ):
         dl = g.get_scratch_array()
         dr = g.get_scratch_array()
 
-        dc[ : , ib:ie+1] = 0.5* ( U[ : , ib+1 : ie+2 ] - U[ : , ib-1 : ie ] )
-        dl[ : , ib:ie+1] = U[ : , ib+1 : ie+2 ] - U[ : , ib : ie+1 ]
-        dr[ : , ib:ie+1] = U[ : , ib : ie+1 ] - U[ : , ib-1 : ie ]
+        dc[ : , g.ilo-1:ie+1] = 0.5* ( U[ : , g.ilo : ie+2 ] - U[ : , g.ilo-2 : ie ] )
+        dl[ : , g.ilo-1:ie+1] = U[ : , g.ilo-1+1 : ie+2 ] - U[ : , g.ilo-1 : ie+1 ]
+        dr[ : , g.ilo-1:ie+1] = U[ : , g.ilo-1 : ie+1 ] - U[ : , g.ilo-2 : ie ]
 
 
         # minmod 
@@ -87,13 +97,13 @@ class Simulation( object ):
         ul = g.get_scratch_array()
         ur = g.get_scratch_array()
 
-        ur[ : , ib : ie + 2 ] = U[ : , ib : ie + 2 ] - \
-                0.5 * ( 1.0 + U[ : , ib : ie+2 ] * dt / self.grid.dx ) * \
-                ldeltau[ : , ib : ie+2 ]
+        ur[ : , g.ilo-1 : ie + 2 ] = U[ : , g.ilo-1 : ie + 2 ] - \
+                0.5 * ( 1.0 + U[ : , g.ilo-1 : ie+2 ] * dt / self.grid.dx ) * \
+                ldeltau[ : , g.ilo-1 : ie+2 ]
 
-        ul[ : , ib+1 : ie+2 ] = U[ : , ib : ie+1 ] +\
-                0.5 * ( 1.0 - U[ : , ib : ie+1 ] * dt / self.grid.dx ) * \
-                ldeltau[ : , ib : ie+1 ]
+        ul[ : , g.ilo : ie+2 ] = U[ : , g.ilo-1 : ie+1 ] +\
+                0.5 * ( 1.0 - U[ : , g.ilo-1 : ie+1 ] * dt / self.grid.dx ) * \
+                ldeltau[ : , g.ilo-1 : ie+1 ]
 
         return ul , ur 
 
@@ -175,7 +185,7 @@ class Simulation( object ):
             unew = self.update( dt , flux )
             self.grid.U[:] = unew[:]
 
-            # update primitives after conservative update
+            # TODO: update primitives after conservative update
 
             self.t += dt
 
