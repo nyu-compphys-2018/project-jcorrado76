@@ -234,4 +234,3 @@ if __name__ == "__main__":
     plt.ylabel("$u$")
     plt.legend()
     plt.savefig("fv-burger-{}.pdf".format( initial_condition ) )
-

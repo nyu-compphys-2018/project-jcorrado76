@@ -61,23 +61,46 @@ class Grid1d_Euler( Grid1d ):
 
     def fill_BCs( self , U ):
         """ fill ghostcells """
-        if self.bc == "periodic":
-            # left boundary
-            self.U[ : , 0 : self.ilo ] = self.U[ : , self.ihi - self.Ng + 1 :\
-                                             self.ihi + 1 ]
+        # see if 1d burgers
+        try:
+            NVAR = U.shape[1]
+        # if not, make sure BCs know 
+        except:
+            NVAR = 1
 
-            # right boundary 
-            self.U[ : , self.ihi + 1 : ] = self.U[ : , self.ilo : \
-                                        self.ilo + self.Ng ]
+        if self.bc == "periodic":
+            # if 1 variable 
+            if NVAR == 1:
+                # left boundary 
+                U[ 0 : self.ilo ] = U [ self.ihi - self.Ng + 1 : \
+                                        self.ihi + 1 ]
+                # right boundary 
+                U[ self.ihi + 1 : ] = U [ self.ilo : \
+                                          self.ilo + self.Ng ]
+                                    
+            # if not, multiple variables
+            else:
+                # left boundary
+                U[ : , 0 : self.ilo ] = U[ : , self.ihi - self.Ng + 1 : \
+                                               self.ihi + 1 ]
+
+                # right boundary 
+                U[ : , self.ihi + 1 : ] = U[ : , self.ilo : \
+                                                 self.ilo + self.Ng ]
 
         elif self.bc == "outflow":
-            # left boundary 
-            for i in range(3):
-                self.U[ i , 0 : self.ilo ] = self.U[ i , self.ilo ]
+            # if 1 variable
+            if NVAR == 1:
+                U[ 0 : self.ilo ] = U[ self.ilo ]
+                U[ self.ihi + 1 : ] = U[ self.ihi ]
+            else:
+                # left boundary 
+                for i in range(NVAR):
+                    self.U[ i , 0 : self.ilo ] = self.U[ i , self.ilo ]
 
-            # right boundary 
-            for i in range(3):
-                self.U[ i , self.ihi + 1 : ] = self.U[ i , self.ihi ]
+                # right boundary 
+                for i in range(NVAR):
+                    self.U[ i , self.ihi + 1 : ] = self.U[ i , self.ihi ]
 
         else:
             sys.exit("invalid BC")
