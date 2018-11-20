@@ -1,5 +1,6 @@
 from grid_1d import *
 import matplotlib.pyplot as plt 
+from params import sod_params
 
 def minmod( a , b ):
     if abs(a) < abs(b) and a * b > 0.0:
@@ -18,7 +19,7 @@ def maxmod( a , b ):
         return 0.0
 
 class Simulation( object ):
-    def __init__( self , grid ):
+    def __init__( self , params , grid ):
         self.grid = grid 
         self.t = 0.0
 
@@ -53,10 +54,17 @@ class Simulation( object ):
         q = self.g.get_scratch_array()
         gamma = self.params['gamma']
 
-        q[ : , QRHO] = U[:, URHO]
-        q[ : , QU]   = U[:, UMX] / U[: , URHO]
-        q[ : , QP]   = (U[:, UENER] - 0.5 * q[ :,QRHO] *\
-                        q[:,QU]**2) * (gamma - 1.0 )
+        WRHO = self.g.QRHO
+        URHO = self.g.URHO
+        WV = self.g.WV
+        UMX = self.g.URHOV
+        WP = self.g.WP
+        UENER = self.g.UENER
+
+        q[ WRHO , : ] = U[ URHO , : ]
+        q[ WV , : ]   = U[ UMX , : ] / U[ URHO , : ]
+        q[ WP , : ]   = (U[ UENER , : ] - 0.5 * q[ WRHO , : ] *\
+                        q[ WV , : ]**2) * (gamma - 1.0 )
 
         return q
 
@@ -201,7 +209,7 @@ if __name__ == "__main__":
 
     plt.clf()
 
-    s = Simulation( g )
+    s = Simulation( sod_params , g )
 
     for i in range(10):
         tend = (i+1)*0.02*tmax
