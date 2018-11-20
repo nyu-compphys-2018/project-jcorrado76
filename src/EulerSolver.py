@@ -17,15 +17,11 @@ class EulerSolver:
         # indices of points grid
 
         # conserved quantities
-        # rho
-        # rhov
-        # energy
+        # rho , rhov , energy
         self.U = np.zeros((3,Nx))
 
         # flux vector
-        # rhov
-        # rhov^2+P
-        # (E+P)v
+        # rhov , rhov^2+P , (E+P)v
         self.F = np.zeros((3,Nx))
 
         # primitives
@@ -148,18 +144,24 @@ class EulerSolver:
         am = np.empty( self.Nx - 1 )
         if self.spatial_order == 1:
             self.update_sound_speed()
-            for i in range( self.Nx - 1 ):
-                ap[i] = max( 0 , +(self.W[1,i] + self.cs[i] ),\
-                        +(self.W[1,i+1] + self.cs[i+1] ) )
-                am[i] = max( 0 , -(self.W[1,i] - self.cs[i] ),\
-                        -(self.W[1,i+1] - self.cs[i+1] ) )
+
+
+
+            indices = np.arange( self.Nx - 1 )
+            ap = np.maximum( 0 , self.W[1,indices]+self.cs[indices] )
+            ap = np.maximum( ap , self.W[1,indices+1] + self.cs[indices+1] )
+
+            am = np.maximum( 0 , -self.W[1,indices] + self.cs[indices] )
+            am = np.maximum( am , -self.W[1,indices+1] + self.cs[indices+1])
 
             self.F[0,:] = self.W[0,:] * self.W[1,:]
             self.F[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
             self.F[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
                 0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
             LU = self.getLU( self.U , ap , am )
-        # high order in space
+
+
+        # HIGH ORDER in space
         elif self.spatial_order != 1:
             theta=1.5
             for i in range( self.Nx-2 ):
@@ -205,13 +207,13 @@ class EulerSolver:
             *self.WIR[1,:]
 
             #Right and left states at the boundaries
-            UIL[0,:]=self.WIL[0,:]
-            UIL[1,:]=self.WIL[0,:]*self.WIL[1,:]
-            UIL[2,:]=self.WIL[2,:]/(self.gamma-1)\
+            self.UIL[0,:]=self.WIL[0,:]
+            self.UIL[1,:]=self.WIL[0,:]*self.WIL[1,:]
+            self.UIL[2,:]=self.WIL[2,:]/(self.gamma-1)\
                     +0.5*self.WIL[0,:]*self.WIL[1,:]**2
-            UIR[0,:]=self.WIR[0,:]
-            UIR[1,:]=self.WIR[0,:]*self.WIR[1,:]
-            UIR[2,:]=self.WIR[2,:]/(self.gamma-1)\
+            self.UIR[0,:]=self.WIR[0,:]
+            self.UIR[1,:]=self.WIR[0,:]*self.WIR[1,:]
+            self.UIR[2,:]=self.WIR[2,:]/(self.gamma-1)\
                     +0.5*self.WIR[0,:]*self.WIR[1,:]**2
 
             #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
@@ -254,14 +256,22 @@ class EulerSolver:
             axis.legend()
         return (axes)
 
+    def plot_convergence( self ):
+        """
+        this function plots the convergence rate of then
+        scheme
+        """
+        Ns = [ 32 , 64 , 128 , 256 , 512 ]
+
+
 def minmod( x , y , z ):
     return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
             (np.sign(x) + np.sign(z)) * \
             min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 
 if __name__=="__main__":
-    e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     e.setSod()
-    e.evolve(1.0)
+    e.evolve(0.1)
     e.plot()
     plt.show()
