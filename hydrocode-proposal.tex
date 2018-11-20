@@ -1,0 +1,84 @@
+%        File: hydrocode-proposal.tex
+%     Created: Tue Nov 13 02:00 PM 2018 E
+% Last Change: Tue Nov 13 02:00 PM 2018 E
+%
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\begin{document}
+\author{Joseph Corrado}
+\title{Relativisitic MHD Hydrocode Proposal}
+\maketitle
+
+\section{Magnetohydrodynamics}
+For my term project I am going to write a multidimensional hydrocode that is relativistic and accounts for an externally applied magnetic field. The equations for ideal magnetohydrodynamics are:
+
+\[
+        \begin{cases}
+                \frac{\partial \bm{B}}{\partial t}=-\nabla \times \bm{E}\\
+                \frac{\partial \rho}{\partial t }+\nabla \cdot (\rho \bm{v})=0\\
+                \rho \frac{d \bm{v}}{dt}=-\nabla p +\bm{j}\times \bm{B}\\
+                \nabla \times \bm{B}=\mu_0 \bm{j}\\
+                \frac{d}{dt}\left( \frac{p}{\rho^{\gamma}} \right)=0\\
+                \bm{E}+\bm{v}\times \bm{B}=0
+        \end{cases}
+\]
+
+Where the low-frequency maxwell's equation assumption has been used, meaning only for low velocities (much less than the speed of light). This will need to be changed in order to incorporate relativity into the model. In this model, I have assumed the adiabatic energy equation, which means I have assumed no heating/conduction/transport so that the changes in every fluid elements pressure and volume are adiabatic. I have also used the Eulerian version of the regular equations of hydrodynamics. But the momentum conservation equation needed to be changed to implement magnetohydrodynamics. The total EM force per unit volume on electrons is given by:
+$$-n_ee(\bm{E}+\bm{v}\times \bm{B})$$
+And the EM force per unit volume on ions is:
+$$n_i e(\bm{E}+\bm{v}\times \bm{B})$$
+Where $n_e$ and $n_i$ are electron and ion number densities. So the total EM force per unit volume would be:
+$$e(n_i-n_e)\bm{E}+(en_i\bm{u_i}-en_e\bm{u_e})\times \bm{B}$$
+If we assume that the fluid is quasi-neutral, then we have that $n_i=n_e$. So the new form of the momentum conservation equation is $\rho \frac{d\bm{u}}{dt}=-\nabla p+\bm{j}\times \bm{B}$, which is the form above. The last equation in the list of equations is there in order to provide an equation for $\bm{E}$ to tell us how to update $\bm{B}$. Using ohms law, we get the equation $\bm{E}+\bm{v}\times \bm{B}=\eta \bm{j}$. For ideal magnetohydrodynamics, we can set $\eta=0$. I can rewrite the equations in their eulerian forms:
+\[
+        \begin{cases}
+                \frac{\partial \rho}{\partial t}=-\nabla \cdot (\rho \bm{v})\\
+                \frac{\partial p}{\partial t}=-\gamma \nabla \cdot \bm{v}\\
+                \frac{\partial \bm{v}}{\partial t}=-\bm{v}\cdot \nabla \cdot \bm{v}-\frac{1}{\rho}\nabla p + \frac{1}{\rho}\bm{j}\times \bm{B} \\
+                \frac{\partial \bm{B}}{\partial t}=\nabla \times (\bm{v}\times \bm{B})\\
+                \bm{j}=\frac{1}{\mu_o}\nabla \times \bm{B}
+        \end{cases}
+\]
+Where the final equation for the current density can be used to eliminate the current density in the conservation of momentum equation. This means that we officially have 8 equations in 8 unknowns. We can rewrite the 8 independent equations in conservative form:
+
+\[
+        \begin{cases}
+                \frac{\partial \rho}{\partial t}=-\nabla \cdot (\rho \bm{v})\\
+                \frac{\partial \rho \bm{v}}{\partial t}=-\nabla \cdot \left( \rho \bm{v}\bm{v}+\bm{I}\left( p+\frac{B^2}{2} \right)-\bm{B}\bm{B} \right)\\
+                \frac{\partial E}{\partial t}=-\nabla \cdot \left( \left( E + p +\frac{B^2}{2\mu_0} \right)\bm{v}-\bm{B}(\bm{v}\cdot \bm{B}) \right)\\
+                \frac{\partial \bm{B}}{\partial t}=-\nabla (\bm{v}\bm{B}-\bm{B}\bm{v})
+        \end{cases}
+\]
+Where $E=\frac{p}{\gamma -1 }+\frac{\rho v^2}{2}+\frac{B^2}{2\mu_0}$ is the total energy density.
+
+\section{Relativity}
+The relativistic portion of my project can be implemented by changing the form of the conservative variables and the flux vectors to include relativity. The new form of the conservative variables $(D,S_x,\tau )$ in terms of the primitive variables $(\rho , v^x, \epsilon )$ is:
+$$\vec{U}=\begin{bmatrix}
+        D \\ S_x \\ \tau
+\end{bmatrix}=\begin{bmatrix}
+        \sqrt{\gamma}W\rho \\ \sqrt{\gamma}\rho h W^2 v_x \\ \sqrt{\gamma}(\rho h W^2 - P - W\rho)
+\end{bmatrix}$$
+Here, $\gamma$ is teh determinant of the 3-metrix $\gamma_{xj}$. $v_x$ is the fluid 3-velocity in the x direction, and $W$ is the lorentz factor:
+$$W=\alpha u^0 = (1-\gamma_{xj}v^xv^j)^{-1/2}$$
+The flux vectors $\vec{F}^x$ are given by:
+$$\vec{F}^x=\begin{bmatrix}
+        \alpha v^x D \\ \alpha \{v^x S_j + \sqrt{\gamma}P \delta_j^x\} \\ \alpha \{v^x \tau + \sqrt{\gamma}v^x P\}
+\end{bmatrix}$$
+We can relate the spatial components of the 4-velocity $u^x$ are related to the 3-velocity by the formula $u^x=Wv^x$. The relativistic speed of sound in the fluid is given by:
+$$C_s^2 = \frac{\partial P}{\partial E}|_S = \frac{\chi}{h}+\frac{Pk}{\rho^2 h}$$
+where $\chi = \frac{\partial P}{\partial \rho}|_\epsilon$ and $k=\frac{\partial P}{\partial \epsilon}|_{\rho}$ and $E=\rho + \rho \epsilon$ is the total rest energy density. We can compute the values in the star region in terms of the primitive and conserved quantities as:
+$$\rho_{*}=\frac{D}{\sqrt{\gamma}W_{*}}$$
+$$\epsilon_{*}=\frac{\tau + D(1-W_{*})+\sqrt{\gamma}(1-W_{*}^2)P}{DW_{*}}$$
+Where we have that:
+$$W_{*}=\frac{1}{\sqrt{1-v^2}}$$
+And $v^2=\gamma^{jk}v_jv_k=v_jv^j$. We can write $v_j$ in terms of the conserved quantities as:
+$$v_j=\frac{S_j}{\tau+\sqrt{\gamma}P+D}$$
+Using this, we can rewrite the expression for $W_{*}$:
+$$W_{*}=\frac{1}{\sqrt{1-\frac{S_j}{\tau + \sqrt{\gamma}P+D}\gamma^{jk}\frac{S_k}{\tau+\sqrt{\gamma}P+D}}}$$
+
+You also need to check on each iteration that you don't get unreasonable velocities. Implement the relativistic part first. 
+
+\end{document}
+
+
