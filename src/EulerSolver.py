@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 class EulerSolver:
-    def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1,\
-            time_order=1):
+    def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
         self.Nx = Nx
         self.a = a
         self.b = b
@@ -50,8 +50,7 @@ class EulerSolver:
         self.WIL = np.zeros((3,self.Nx-2))
         self.WIR = np.zeros((3,self.Nx-2))
 
-    def setSod( self ,  x0=0.5 , left_states=[1,0,1] , \
-            right_states=[0.1,0.0,0.125],  gamma=1.4 ):
+    def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.1,0.0,0.125],  gamma=1.4 ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
         left-states - List , values of pressure velocity and pressure for the
@@ -263,6 +262,6 @@ def minmod( x , y , z ):
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     e.setSod()
-    e.evolve(0.1)
+    e.evolve(1.0)
     e.plot()
     plt.show()
