@@ -25,9 +25,7 @@ class EulerSolver:
         self.F = np.zeros((3,Nx))
 
         # primitives
-        # density
-        # velocity
-        # pressure
+        # density, velocity, pressure
         self.W = np.zeros((3,Nx))
 
         # speed of sound
@@ -145,8 +143,6 @@ class EulerSolver:
         if self.spatial_order == 1:
             self.update_sound_speed()
 
-
-
             indices = np.arange( self.Nx - 1 )
             ap = np.maximum( 0 , self.W[1,indices]+self.cs[indices] )
             ap = np.maximum( ap , self.W[1,indices+1] + self.cs[indices+1] )
@@ -164,6 +160,7 @@ class EulerSolver:
         # HIGH ORDER in space
         elif self.spatial_order != 1:
             theta=1.5
+            # TODO: make the loop over NVAR, and use vectorized operation in x
             for i in range( self.Nx-2 ):
                 self.UIL[:,i] = self.U[:,i+1] + 0.5 *\
                 minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
@@ -216,10 +213,14 @@ class EulerSolver:
             self.UIR[2,:]=self.WIR[2,:]/(self.gamma-1)\
                     +0.5*self.WIR[0,:]*self.WIR[1,:]**2
 
+
+
+            #FHLL =
             #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
-            FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*(u1R[1:] - u1L[:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*(u2R[1:] - u2L[:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*(u3R[1:] - u3L[:-1]) ) / (ap[1:-1] + am[1:-1])
+            # TODO: calculate FHLL in vectoried way
+            FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[0,1:] - self.UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*( self.UIR[1,1:] - self.UIL[1,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[2,1:] - self.UIL[2,:-1]) ) / (ap[1:-1] + am[1:-1])
 
             LU = np.zeros((3,self.Nx))
 
@@ -270,7 +271,7 @@ def minmod( x , y , z ):
             min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 
 if __name__=="__main__":
-    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
     e.setSod()
     e.evolve(0.1)
     e.plot()
