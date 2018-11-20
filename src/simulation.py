@@ -1,5 +1,5 @@
 from grid_1d import *
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from params import sod_params
 
 def minmod( a , b ):
@@ -14,13 +14,13 @@ def maxmod( a , b ):
     if abs(a) > abs(b) and a * b > 0.0:
         return a
     elif abs(b) < abs(a) and a * b > 0.0:
-        return b 
+        return b
     else:
         return 0.0
 
 class Simulation( object ):
     def __init__( self , params , grid ):
-        self.grid = grid 
+        self.grid = grid
         self.t = 0.0
 
     def set_ICs( self , type='tophat' ):
@@ -34,14 +34,14 @@ class Simulation( object ):
 
             # indices are the middle third of grid
             index = np.logical_and( self.grid.xs >= 0.333, \
-                    self.grid.xs <= 0.666 ) 
+                    self.grid.xs <= 0.666 )
 
             self.grid.U[ : , index ] += \
                     0.5*np.sin(2.0*np.pi*(self.grid.xs[index]-0.333)/0.333)
 
         elif type == "rarefaction":
             self.grid.U[:] = 1.0
-            self.grid.U[ self.grid.xs > 0.5 ]  = 2.0 
+            self.grid.U[ self.grid.xs > 0.5 ]  = 2.0
 
     # TODO: this needs to depend on eigenvalues; alphas, not just the velocities
     # but I will only put velocities here to get the structure correct
@@ -69,11 +69,11 @@ class Simulation( object ):
         return q
 
     def states( self , dt ):
-        """ reconstruct left and right interface states 
+        """ reconstruct left and right interface states
             implemented:
             minmod
 
-            TODO:
+            not implemented: 
             godunov
             centered
             MC
@@ -82,7 +82,7 @@ class Simulation( object ):
         g = self.grid
 
         # compute piecewise linear slopes -- 2nd order MC limiter
-        # pick a range of cells that includes 1 ghost cell on either side 
+        # pick a range of cells that includes 1 ghost cell on either side
         ie = g.ihi + 1
 
         U = g.U
@@ -96,7 +96,7 @@ class Simulation( object ):
         dr[ : , g.ilo-1:ie+1] = U[ : , g.ilo-1 : ie+1 ] - U[ : , g.ilo-2 : ie ]
 
 
-        # minmod 
+        # minmod
         d1 = 2.0 * np.where( np.fabs( dl ) < np.fabs( dr ) , dl , dr )
         d2 = np.where( np.fabs( dc ) < np.fabs( d1 ) , dc , d1 )
         ldeltau = np.where( dl * dr > 0.0 , d2 , 0.0 )
@@ -113,21 +113,21 @@ class Simulation( object ):
                 0.5 * ( 1.0 - U[ : , g.ilo-1 : ie+1 ] * dt / self.grid.dx ) * \
                 ldeltau[ : , g.ilo-1 : ie+1 ]
 
-        return ul , ur 
+        return ul , ur
 
-    # TODO: Need to write 3 separate flux functions in here 
+    # TODO: Need to write 3 separate flux functions in here
     # TODO: Need to compute HLL flux in here
     def riemann( self , ul , ur ):
-        """ 
-        solve the riemann problem given the left and right states 
-        returns flux at interfaces, given left and right states 
+        """
+        solve the riemann problem given the left and right states
+        returns flux at interfaces, given left and right states
         implemented:
         upwinding
         HLL
 
         """
 
-        # TODO: need to compute the HLL flux here 
+        # TODO: need to compute the HLL flux here
         S = 0.5 * ( ul + ur )
         ushock = np.where( S>0.0 , ul , ur )
         ushock = np.where( S==0.0 , 0.0 , ushock )
@@ -138,7 +138,7 @@ class Simulation( object ):
 
         us = np.where( ul > ur , ushock , urare )
 
-        return( 0.5 * us * us ) 
+        return( 0.5 * us * us )
 
     # TODO: try to use this inside riemann
     def get_HLL_Flux( self , U , ap , am ):
@@ -151,7 +151,7 @@ class Simulation( object ):
         LU[:,1:-1] = -(FHLL[:,1:]-FHLL[:,:-1]) / self.dx
         return LU
 
-    # TODO: implement rk4_substep update as well 
+    # TODO: implement rk4_substep update as well
     def update( self , dt , flux ):
         """ perform the conservative update """
 
@@ -167,29 +167,29 @@ class Simulation( object ):
         return( unew )
 
     def evolve( self , C , tmax ):
-        # set time to zero 
+        # set time to zero
         self.t = 0.0
 
-        # alias for access to grid 
+        # alias for access to grid
         g = self.grid
 
         while( self.t < tmax ):
-            # fill boundary conditions 
+            # fill boundary conditions
             g.fill_BCs()
 
             # get the timestep
             dt = self.compute_timestep( C )
 
             if ( self.t + dt > tmax ):
-                dt = tmax - self.t 
+                dt = tmax - self.t
 
-            # compute interface states 
+            # compute interface states
             ul , ur = self.states( dt )
 
-            # solve riemann problem 
+            # solve riemann problem
             flux = self.riemann( ul , ur )
 
-            # do conservative update 
+            # do conservative update
             unew = self.update( dt , flux )
             self.grid.U[:] = unew[:]
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
         s.evolve( C , tend )
 
-        # make color depend on which time step we're going to 
+        # make color depend on which time step we're going to
         c = 1.0 - ( 0.1 + i * 0.1 )
 
         g = s.grid
