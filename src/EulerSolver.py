@@ -129,6 +129,7 @@ class EulerSolver:
             self.t += dt # increment time
 
     def get_dt(self ):
+        # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
         self.cs = np.sqrt( self.gamma * self.W[2,:] / self.W[0,:] )
         dt = self.cfl * self.dx / \
                 np.max([ np.max( np.fabs( self.W[1,:] + self.cs ) ) ,\
@@ -271,7 +272,7 @@ def minmod( x , y , z ):
             min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 
 if __name__=="__main__":
-    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
+    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     e.setSod()
     e.evolve(0.1)
     e.plot()
