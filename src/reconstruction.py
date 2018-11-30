@@ -16,6 +16,8 @@ def maxmod( a , b ):
 def shifted(s, x):
     # returns slice shifted by x
     return slice(s.start + x, s.stop + x)
+
+    
 class State_Reconstructor( object ):
     def __init__(self, grid,type='minmod'):
         self.grid=grid

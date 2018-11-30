@@ -141,7 +141,7 @@ class EulerSolver:
 
     def get_dt(self ):
         # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
-        self.cs = np.sqrt( self.gamma * self.W[2,:] / self.W[0,:] )
+        self.update_sound_speed()
         dt = self.cfl * self.dx / \
                 np.max([ np.max( np.fabs( self.W[1,:] + self.cs ) ) ,\
                          np.max( np.fabs( self.W[1,:] - self.cs ) )])
@@ -310,8 +310,8 @@ def plot_convergence():
 
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
-    # e.setSod()
-    e.setSmoothWave()
+    e.setSod()
+    # e.setSmoothWave()
     e.evolve(0.1)
     e.plot()
     # plot_convergence()

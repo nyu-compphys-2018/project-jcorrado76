@@ -73,6 +73,7 @@ class Simulation( object ):
         return flux
 
     def reconstruct_states( self ):
+        """ reconstruct left and right states """
         g = self.grid
         UL = g.get_scratch_array()
         UR = g.get_scratch_array()
@@ -91,16 +92,15 @@ class Simulation( object ):
 
         return UL,UR
 
-
     # TODO: Need to write 3 separate flux functions in here
     # TODO: Need to compute HLL flux in here
     def riemann( self , ul , ur ):
         """
+        computes flux
         solve the riemann problem given the left and right states
         returns flux at interfaces, given left and right states
         implemented:
         HLL
-
         """
 
         # TODO: need to compute the HLL flux here
@@ -197,7 +197,6 @@ class Simulation( object ):
             self.t += dt
             # start rk4 substeps, then sweep in spatial direction, reconstructing boundary
             # states, etc.
-
 
             # compute interface states
             ul , ur = self.states(dt)

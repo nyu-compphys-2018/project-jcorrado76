@@ -4,14 +4,14 @@ def main():
     xmax = 1.0
     nx = 256
     ng = 2
-    tmax = 0.1
+    tmax = 0.2
     CFL = 0.8
     # Build the grid
     g = Grid1d_Euler( nx , ng , bc='outflow' )
     # physical index alias
     physical = g.physical
     # Assign initial conditions
-    initial_condition = "sod"
+    initial_condition = "sine"
     ICs = IC_Manager( g )
     ICs.set_ICs(initial_condition)
     # initialize simulation object with ICs in place
