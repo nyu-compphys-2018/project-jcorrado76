@@ -1,6 +1,5 @@
 from grid_1d import *
 import matplotlib.pyplot as plt
-from params import sod_params
 
 def minmod( a , b ):
     if abs(a) < abs(b) and a * b > 0.0:
@@ -9,7 +8,6 @@ def minmod( a , b ):
         return b
     else:
         return 0.0
-
 def maxmod( a , b ):
     if abs(a) > abs(b) and a * b > 0.0:
         return a
@@ -19,7 +17,7 @@ def maxmod( a , b ):
         return 0.0
 
 class Simulation( object ):
-    def __init__( self , params , grid ):
+    def __init__( self , grid ):
         self.grid = grid
         self.t = 0.0
 
@@ -41,7 +39,7 @@ class Simulation( object ):
 
         elif type == "rarefaction":
             self.grid.U[:] = 1.0
-            self.grid.U[ self.grid.xs > 0.5 ]  = 2.0
+            self.grid.U[ :, self.grid.xs > 0.5 ]  = 2.0
 
     # TODO: this needs to depend on eigenvalues; alphas, not just the velocities
     # but I will only put velocities here to get the structure correct

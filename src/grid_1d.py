@@ -1,7 +1,5 @@
 import numpy as np
 import sys
-
-
 class Grid1d( object ):
     def __init__( self , N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow' ):
         self.N = N
@@ -12,13 +10,15 @@ class Grid1d( object ):
         self.ilo = Ng
         self.ihi = Ng + N - 1
         self.dx = (xmax - xmin) / N
+        self.grid_size = N + 2 * Ng
         self.xs = xmin + \
                 (np.arange( N + 2 * Ng ) - Ng + 0.5 ) * self.dx
-        self.U = np.zeros( N + 2 * Ng , dtype=np.float64 )
+        self.U = np.zeros( self.grid_size , dtype=np.float64 )
+        self.physical = slice(self.ilo,self.ihi+1)
 
     def get_scratch_array( self ):
         """ return a scratch array dimensioned for our grid """
-        return( np.zeros( (self.N + 2 * self.Ng ) , dtype=np.float64 ))
+        return( np.zeros( (self.grid_size ) , dtype=np.float64 ))
 
     def fill_BCs( self ):
         """ fill ghostcells """
@@ -42,23 +42,27 @@ class Grid1d( object ):
         else:
             sys.exit("invalid BC")
 
-
 class Grid1d_Euler( Grid1d ):
     def __init__( self , N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow' ):
-        super().__init__(N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow')
+        # call constructor of parent
+        super().__init__(N , Ng , xmin=xmin , xmax=xmax , bc=bc)
+        # indices of row for each variable
         self.WRHO = 0
         self.URHO = 0
         self.WV   = 1
         self.URHOV= 1
         self.WP   = 2
         self.UENER= 2
+        # number of variables to evolve
         self.NVAR = 3
-        self.U = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
-        self.W = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
+        # conserved variables, 3 rows, many columns
+        self.U = np.zeros( (self.NVAR , self.grid_size ) , dtype=np.float64 )
+        # primitive variables
+        self.W = np.zeros( (self.NVAR , self.grid_size ) , dtype=np.float64 )
         self.cons_vars = ['density','velocity','energy']
 
     def get_scratch_array( self ):
-        return( np.zeros( (self.NVAR, self.N + 2 * self.Ng ) , dtype=np.float64 ) )
+        return( np.zeros( (self.NVAR, self.grid_size ) , dtype=np.float64 ) )
 
     def fill_BCs( self ):
         """ fill ghostcells """
