@@ -11,7 +11,7 @@ def main():
     # physical index alias
     physical = g.physical
     # Assign initial conditions
-    initial_condition = "sine"
+    initial_condition = "sod"
     ICs = IC_Manager( g )
     ICs.set_ICs(initial_condition)
     # initialize simulation object with ICs in place
@@ -25,9 +25,9 @@ def main():
     # plot them
     fig,ax = plt.subplots(3,1,sharex=True)
     for var in range(g.NVAR):
-        ax[var].plot( g.xs[physical],\
-                g.U[var,physical], color='k',\
-                label='t={}'.format(tmax))
+        # ax[var].plot( g.xs[physical],\
+        #         g.U[var,physical], color='k',\
+        #         label='t={}'.format(tmax))
         ax[var].plot( g.xs[physical] ,uinit[var,physical],\
                 ls=":",color="red",zorder=-1,\
                 label='initial configuration')
