@@ -71,7 +71,7 @@ class EulerSolver:
         self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
                 self.W[2,:] / (self.gamma - 1.0)
 
-    def setInitialWave( self , rho0 , p0 , alpha , f , *args ):
+    def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** self.gamma
@@ -318,7 +318,7 @@ if __name__=="__main__":
     # e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setInitialWave(rho0,p0,alpha,f,x0,sigma)
+    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve(0.1)
     axes = e.plot()
