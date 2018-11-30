@@ -8,13 +8,14 @@ def main():
     CFL = 0.8
     # Build the grid
     g = Grid1d_Euler( nx , ng , bc='outflow' )
-    # physical indices
+    # physical index alias
     physical = g.physical
-    # simulation object
-    s = Simulation( g )
     # Assign initial conditions
-    initial_condition = "rarefaction"
-    s.set_ICs( initial_condition )
+    initial_condition = "sine"
+    ICs = IC_Manager( g )
+    ICs.set_ICs(initial_condition)
+    # initialize simulation object with ICs in place
+    s = Simulation( g )
     # Save initial conditions
     uinit = s.grid.U.copy()
     # evolve forward in time
@@ -44,4 +45,5 @@ if __name__=="__main__":
     import matplotlib.pyplot as plt
     from grid_1d import Grid1d_Euler
     from simulation import Simulation
+    from initial_conditions import IC_Manager
     main()

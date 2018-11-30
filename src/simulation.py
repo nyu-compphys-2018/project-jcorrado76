@@ -1,5 +1,6 @@
-from grid_1d import *
-import matplotlib.pyplot as plt
+from grid_1d import Grid1d_Euler
+
+import numpy as np
 
 def minmod( a , b ):
     if abs(a) < abs(b) and a * b > 0.0:
@@ -20,26 +21,6 @@ class Simulation( object ):
     def __init__( self , grid ):
         self.grid = grid
         self.t = 0.0
-
-    def set_ICs( self , type='tophat' ):
-        if type == 'tophat':
-            self.grid.U[ : , np.logical_and( self.grid.xs >= 0.333, \
-                    self.grid.xs <= 0.666 ) ] = 1.0
-
-        elif type == "sine":
-            # initialize all state variables to 1.0
-            self.grid.U[ : , : ] = 1.0
-
-            # indices are the middle third of grid
-            index = np.logical_and( self.grid.xs >= 0.333, \
-                    self.grid.xs <= 0.666 )
-
-            self.grid.U[ : , index ] += \
-                    0.5*np.sin(2.0*np.pi*(self.grid.xs[index]-0.333)/0.333)
-
-        elif type == "rarefaction":
-            self.grid.U[:] = 1.0
-            self.grid.U[ :, self.grid.xs > 0.5 ]  = 2.0
 
     # TODO: this needs to depend on eigenvalues; alphas, not just the velocities
     # but I will only put velocities here to get the structure correct
@@ -197,19 +178,24 @@ class Simulation( object ):
             self.t += dt
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    from initial_conditions import IC_Manager
     xmin = 0.0
     xmax = 1.0
     nx = 256
     ng = 2
     g = Grid1d_Euler( nx , ng , bc='outflow' )
+
+    initial_condition = "rarefaction"
+    ICs = IC_Manager( g )
+    ICs.set_ICs(initial_condition)
     tmax = 0.1
     CFL = 0.8
     physical = slice(g.ilo,g.ihi+1)
     fig,ax = plt.subplots(3,1,sharex=True)
-    s = Simulation( sod_params , g )
+    s = Simulation( g )
 
-    initial_condition = "sine"
-    s.set_ICs( initial_condition )
+    # s.set_ICs( initial_condition )
 
     uinit = s.grid.U.copy()
 
