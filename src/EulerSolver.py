@@ -142,6 +142,15 @@ class EulerSolver:
                 self.update_primitive_variables()
             self.t += dt # increment time
 
+    def Euler_Flux( self , W ):
+        """ compute fluxes for each cell using primitives """
+        flux = np.zeros((3,self.Nx))
+        flux[0,:] = self.W[0,:] * self.W[1,:]
+        flux[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
+        flux[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
+            0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
+        return flux
+
     def get_dt(self ):
         # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
         self.cs = self.get_sound_speed( self.W[0,:],self.W[2,:])
@@ -180,10 +189,11 @@ class EulerSolver:
             am = np.maximum( 0 , -self.W[1,indices] + self.cs[indices] )
             am = np.maximum( am , -self.W[1,indices+1] + self.cs[indices+1])
 
-            self.F[0,:] = self.W[0,:] * self.W[1,:]
-            self.F[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
-            self.F[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
-                0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
+            # self.F[0,:] = self.W[0,:] * self.W[1,:]
+            # self.F[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
+            # self.F[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
+            #     0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
+            self.F[:,:] = self.Euler_Flux( self.W )
             LU = self.getLU( self.U , ap , am )
 
 
@@ -314,7 +324,7 @@ if __name__=="__main__":
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
     # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
-    e.evolve(0.1)
+    e.evolve(0.2)
     axes = e.plot()
     init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
     for i, axis in enumerate(axes):
