@@ -73,10 +73,10 @@ class EulerSolver:
 
     def setInitialWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
-        rho = isentropic_initial_rho( rho0 , alpha , initial_wave )
-        p = isentropic_initial_P( rho , rho0 , p0 , self.gamma )
-        self.cs = cs( p , rho , self.gamma )
-        self.v = isentropic_initial_v( rho , rho0 , p ,p0 , self.gamma)
+        rho = rho0 * (1.0 + alpha * initial_wave)
+        p = p0 * ( rho / rho0 ) ** self.gamma
+        self.cs = np.sqrt( self.gamma * p / rho )
+        self.v = (2. / (self.gamma-1.) ) * (self.cs- np.sqrt(self.gamma*p/rho))
 
         self.U[0,:] = rho
         self.U[1,:] = rho * self.v
@@ -91,8 +91,8 @@ class EulerSolver:
         self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
                 self.W[2,:] / (self.gamma - 1.0)
 
-    def update_sound_speed(self):
-        self.cs = np.sqrt( self.gamma * self.W[2,:] / self.W[0,:] )
+    def get_sound_speed(self, r , p):
+        return np.sqrt( self.gamma * p / r )
 
     def update_conservative_variables_RK3(self,dt):
         U0 = self.U
@@ -141,7 +141,7 @@ class EulerSolver:
 
     def get_dt(self ):
         # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
-        self.update_sound_speed()
+        self.cs = self.get_sound_speed( self.W[0,:],self.W[2,:])
         dt = self.cfl * self.dx / \
                 np.max([ np.max( np.fabs( self.W[1,:] + self.cs ) ) ,\
                          np.max( np.fabs( self.W[1,:] - self.cs ) )])
@@ -153,7 +153,7 @@ class EulerSolver:
         ap = np.empty( self.Nx - 1 )
         am = np.empty( self.Nx - 1 )
         if self.spatial_order == 1:
-            self.update_sound_speed()
+            self.get_sound_speed(self.W[0,:],self.W[2,:])
 
             indices = np.arange( self.Nx - 1 )
             ap = np.maximum( 0 , self.W[1,indices]+self.cs[indices] )
