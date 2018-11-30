@@ -218,18 +218,6 @@ class EulerSolver:
                     0.5*self.WIR[0,:]*self.WIR[1,:]**2) + self.WIR[2,:] )\
             *self.WIR[1,:]
 
-            #Right and left states at the boundaries
-            self.UIL[0,:]=self.WIL[0,:]
-            self.UIL[1,:]=self.WIL[0,:]*self.WIL[1,:]
-            self.UIL[2,:]=self.WIL[2,:]/(self.gamma-1)\
-                    +0.5*self.WIL[0,:]*self.WIL[1,:]**2
-            self.UIR[0,:]=self.WIR[0,:]
-            self.UIR[1,:]=self.WIR[0,:]*self.WIR[1,:]
-            self.UIR[2,:]=self.WIR[2,:]/(self.gamma-1)\
-                    +0.5*self.WIR[0,:]*self.WIR[1,:]**2
-
-
-
             #FHLL =
             #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
             FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[0,1:] - self.UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
@@ -315,10 +303,10 @@ def f(x,x0,sigma):
 
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
-    # e.setSod()
+    e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve(0.1)
     axes = e.plot()
