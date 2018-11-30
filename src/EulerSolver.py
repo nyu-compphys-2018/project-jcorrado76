@@ -123,6 +123,15 @@ class EulerSolver:
         self.W[2,:] = ( self.gamma - 1.0 ) *\
                 ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
 
+    def cons_to_prim( self , U ):
+        """ perform a recovery of the primitive variables """
+        W = np.zeros((3,Nx))
+        W[0,:] = self.U[0,:]
+        W[1,:] = self.U[1,:] / self.U[0,:]
+        W[2,:] = ( self.gamma - 1.0 ) *\
+                ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
+        return W
+
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
@@ -161,6 +170,7 @@ class EulerSolver:
 
     def Reconstruct_States(self, theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
+        # TODO: this is slow because it loops over Nx
         for i in range( self.Nx-2 ):
             UIL[:,i] = self.U[:,i+1] + 0.5 *\
             minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
@@ -185,68 +195,35 @@ class EulerSolver:
             indices = np.arange( self.Nx - 1 )
             ap = np.maximum( 0 , self.W[1,indices]+self.cs[indices] )
             ap = np.maximum( ap , self.W[1,indices+1] + self.cs[indices+1] )
-
             am = np.maximum( 0 , -self.W[1,indices] + self.cs[indices] )
             am = np.maximum( am , -self.W[1,indices+1] + self.cs[indices+1])
 
-            # self.F[0,:] = self.W[0,:] * self.W[1,:]
-            # self.F[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
-            # self.F[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
-            #     0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
             self.F[:,:] = self.Euler_Flux( self.W )
             LU = self.getLU( self.U , ap , am )
-
-
-        # HIGH ORDER in space
         elif self.spatial_order != 1:
-            theta=1.5
-            # TODO: make the loop over NVAR, and use vectorized operation in x
+            FHLL = np.zeros((3,self.Nx))
+            LU = np.zeros((3,self.Nx))
             UIL, UIR = self.Reconstruct_States()
 
-            # need to update interpolated values of primitives at boundaries
-            self.WIL[0,:] = UIL[0,:]
-            self.WIL[1,:] =  UIL[1,:] /  UIL[0,:]
-            self.WIL[2,:] = ( self.gamma - 1.0 ) *\
-                    (  UIL[2,:] - 0.5 *  UIL[1,:]**2 /  UIL[0,:] )
-            self.WIR[0,:] =  UIR[0,:]
-            self.WIR[1,:] =  UIR[1,:] /  UIR[0,:]
-            self.WIR[2,:] = ( self.gamma - 1.0 ) *\
-                    (  UIR[2,:] - 0.5 *  UIR[1,:]**2 /  UIR[0,:] )
+            WIL = self.cons_to_prim( UIL )
+            WIR = self.cons_to_prim( UIR )
 
-            self.csL = (self.gamma * self.WIL[2,:]/self.WIL[0,:])**0.5
-            self.csR = (self.gamma * self.WIR[2,:]/self.WIR[0,:])**0.5
-            # 2 ghost cells on either side
-            # update ap and am at k * x + 0.5
+            get_sound_speed(self, r , p)
+
+            csL = self.get_sound_speed( WIL[0,:], WIL[2,:] )
+            csR = self.get_sound_speed( WIR[0,:], WIR[2,:] )
+
             for i in range(1,self.Nx-2):
-                ap[i] = max(0, +(self.WIL[1,i-1]+self.csL[i-1]), +(self.WIR[1,i]+self.csR[i]) )
-                am[i] = max(0, -(self.WIL[1,i-1]-self.csL[i-1]), -(self.WIR[1,i]-self.csR[i]) )
+                ap[i] = max(0, +(WIL[1,i-1] + csL[i-1]), + (WIR[1,i] + csR[i]) )
+                am[i] = max(0, -(WIL[1,i-1] - csL[i-1]), - (WIR[1,i] - csR[i]) )
 
-            #Flux for the left (similar to rL,vL,PL) and right states (similar to rR,vR,pR) at boundaries
-            F1L = self.WIL[0,:]*self.WIL[1,:]
-            F2L = self.WIL[0,:]*self.WIL[1,:]**2 + self.WIL[2,:]
-            F3L = ( (self.WIL[2,:]/(self.gamma - 1) +\
-                    0.5*self.WIL[0,:]*self.WIL[1,:]**2) + self.WIL[2,:] )\
-            *self.WIL[1,:]
+            FL = self.Euler_Flux( WIL )
+            FR = self.Euler_Flux( WIR )
 
-            F1R = self.WIR[0,:]*self.WIR[1,:]
-            F2R = self.WIR[0,:]*self.WIR[1,:]**2 + self.WIR[2,:]
-            F3R = ( (self.WIR[2,:]/(self.gamma - 1) +\
-                    0.5*self.WIR[0,:]*self.WIR[1,:]**2) + self.WIR[2,:] )\
-            *self.WIR[1,:]
+            for i in range(3):
+                FHLL[i,:] = ( ap[1:-1]*FL[i,:-1] + am[1:-1]*FR[i,1:] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
+                LU[i,2:,-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
 
-            #FHLL =
-            #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
-            FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*( UIR[0,1:] -  UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*(  UIR[1,1:] -  UIL[1,:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*( UIR[2,1:] -  UIL[2,:-1]) ) / (ap[1:-1] + am[1:-1])
-
-            LU = np.zeros((3,self.Nx))
-
-            #The first and last 2 states are fixed, change is in cells 2,3,...Nx-3
-            #from fluxes at boundaries of each cell (1+0.5, 2+0.5) , (2+0.5 , 3+0.5) ... (Nx-2+0.5, Nx-3+0.5) respectively
-            LU[0,2:-2]=-(FHLL1[1:]-FHLL1[:-1])/self.dx
-            LU[1,2:-2]=-(FHLL2[1:]-FHLL2[:-1])/self.dx
-            LU[2,2:-2]=-(FHLL3[1:]-FHLL3[:-1])/self.dx
         return LU
 
     def getLU( self , U , ap , am ):
@@ -318,14 +295,16 @@ def f(x,x0,sigma):
     return(np.where(abs(x-x0)<sigma , (1-((x-x0)/sigma)**2)**2 , 0))
 
 if __name__=="__main__":
+    t = 0.1
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
     # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
-    e.evolve(0.2)
+    e.evolve( t )
     axes = e.plot()
+    # add the initial configurations on each subplot
     init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
     for i, axis in enumerate(axes):
         axis.plot( e.x , winit[i,:], label=init_labels[i])
