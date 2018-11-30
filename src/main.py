@@ -18,6 +18,7 @@ def main():
     s = Simulation( g )
     # Save initial conditions
     uinit = s.grid.U.copy()
+    winit = s.grid.W.copy()
     # evolve forward in time
     s.evolve( CFL , tmax )
     # get the final values of variables that live on grid
@@ -25,9 +26,9 @@ def main():
     # plot them
     fig,ax = plt.subplots(3,1,sharex=True)
     for var in range(g.NVAR):
-        # ax[var].plot( g.xs[physical],\
-        #         g.U[var,physical], color='k',\
-        #         label='t={}'.format(tmax))
+        ax[var].plot( g.xs[physical],\
+                g.U[var,physical], color='k',\
+                label='t={}'.format(tmax))
         ax[var].plot( g.xs[physical] ,uinit[var,physical],\
                 ls=":",color="red",zorder=-1,\
                 label='initial configuration')

@@ -16,6 +16,10 @@ def maxmod( a , b ):
         return b
     else:
         return 0.0
+def shifted(s, x):
+    # returns slice shifted by x 
+    return slice(s.start + x: s.stop + x)
+
 
 class Simulation( object ):
     def __init__( self , grid ):
@@ -134,15 +138,11 @@ class Simulation( object ):
     # TODO: implement rk4_substep update as well
     def update( self , dt , flux ):
         """ perform the conservative update """
-
         g = self.grid
-
         unew = g.get_scratch_array()
-
-        unew[ : , g.ilo : g.ihi+1 ] = \
-                g.U[ : , g.ilo : g.ihi+1 ] + \
-                dt / g.dx * \
-                ( flux[ : , g.ilo : g.ihi+1 ] - flux[ : , g.ilo+1 : g.ihi+2 ] )
+        unew[ : , g.physical ] = \
+                g.U[ : , g.physical ] + \
+                dt / g.dx * ( flux[ : , g.physical ] - flux[ : , shifted(g.physical,1) ] )
 
         return( unew )
 
