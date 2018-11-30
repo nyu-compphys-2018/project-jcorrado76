@@ -14,6 +14,7 @@ class EulerSolver:
         self.grid_size = self.Nx + 2 * self.Ng
         self.k = np.arange(Nx) + 0.5
         self.dx = (self.b-self.a)/float(self.Nx)
+        # x values of bin centers
         self.x = a + self.dx * ( self.k )
         # indices of points grid
 
@@ -82,8 +83,13 @@ class EulerSolver:
         self.U[2,:] = total_energy( p , rho , self.v , self.gamma)
 
     def setSmoothWave( self ):
-        print("Hello world")
-
+        self.W[0,:] = np.sin(2 * np.pi * self.x)
+        self.W[1,:] = 0.0
+        self.W[2,:] = 1.0
+        self.U[0,:] = self.W[0,:] # set initial density
+        self.U[1,:] = self.W[0,:] * self.W[1,:]
+        self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
+                self.W[2,:] / (self.gamma - 1.0)
 
     def update_sound_speed(self):
         self.cs = np.sqrt( self.gamma * self.W[2,:] / self.W[0,:] )
@@ -304,7 +310,8 @@ def plot_convergence():
 
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
-    e.setSod()
+    # e.setSod()
+    e.setSmoothWave()
     e.evolve(0.1)
     e.plot()
     # plot_convergence()

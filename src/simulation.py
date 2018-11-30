@@ -73,7 +73,7 @@ class Simulation( object ):
             implemented:
             minmod
 
-            not implemented: 
+            not implemented:
             godunov
             centered
             MC
@@ -142,6 +142,7 @@ class Simulation( object ):
 
     # TODO: try to use this inside riemann
     def get_HLL_Flux( self , U , ap , am ):
+        """ compute update using HLLE flux  """
         FL = self.F[:,:-1]
         FR = self.F[:,1:]
         UL = U[:,:-1]
@@ -202,43 +203,33 @@ if __name__ == "__main__":
     xmax = 1.0
     nx = 256
     ng = 2
-    g = Grid1d_Euler( nx , ng , bc='periodic' )
-    tmax = (xmax - xmin)/1.0
-
-    C = 0.8
-
-    plt.clf()
-
+    g = Grid1d_Euler( nx , ng , bc='outflow' )
+    tmax = 0.1
+    CFL = 0.8
+    physical = slice(g.ilo,g.ihi+1)
+    fig,ax = plt.subplots(3,1,sharex=True)
     s = Simulation( sod_params , g )
 
-    for i in range(10):
-        tend = (i+1)*0.02*tmax
+    initial_condition = "sine"
+    s.set_ICs( initial_condition )
 
-        initial_condition = "tophat"
-        s.set_ICs( initial_condition )
+    uinit = s.grid.U.copy()
 
-        uinit = s.grid.U.copy()
-
-        s.evolve( C , tend )
-
-        # make color depend on which time step we're going to
-        c = 1.0 - ( 0.1 + i * 0.1 )
-
-        g = s.grid
-        # TODO: need to plot all state variables
-        plt.plot( g.xs[g.ilo:g.ihi+1],\
-                g.U[0,g.ilo:g.ihi+1], color=str(c),\
-                label='t={}'.format(tend))
-
-        g = s.grid
+    s.evolve( CFL , tmax )
 
     g = s.grid
-    # TODO: need to plot all initial state variabels
-    plt.plot( g.xs[g.ilo:g.ihi+1] ,uinit[0,g.ilo:g.ihi+1],\
-            ls=":",color="0.9",zorder=-1,\
-            label='initial configuration')
+    for var in range(g.NVAR):
+        ax[var].plot( g.xs[physical],\
+                g.U[var,physical], color='k',\
+                label='t={}'.format(tmax))
+        ax[var].plot( g.xs[physical] ,uinit[var,physical],\
+                ls=":",color="red",zorder=-1,\
+                label='initial configuration')
+        ax[var].legend(loc='best')
+        ax[var].set_ylabel(g.cons_vars[var])
 
     plt.xlabel("$x$")
-    plt.ylabel("$u$")
-    plt.legend()
+    # plt.ylabel("$u$")
     plt.savefig("fv-burger-{}.pdf".format( initial_condition ) )
+    plt.suptitle("Solution for {} wave".format(initial_condition))
+    plt.show()

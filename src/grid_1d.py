@@ -28,15 +28,15 @@ class Grid1d( object ):
             self.U[ 0 : self.ilo ] = self.U[ self.ihi - self.Ng + 1 :\
                                              self.ihi + 1 ]
 
-            # right boundary 
+            # right boundary
             self.U[ self.ihi + 1 : ] = self.U[ self.ilo : \
                                         self.ilo + self.Ng ]
 
         elif self.bc == "outflow":
-            # left boundary 
+            # left boundary
             self.U[ 0 : self.ilo ] = self.U[ self.ilo ]
 
-            # right boundary 
+            # right boundary
             self.U[ self.ihi + 1 : ] = self.U[ self.ihi ]
 
         else:
@@ -55,54 +55,53 @@ class Grid1d_Euler( Grid1d ):
         self.NVAR = 3
         self.U = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
         self.W = np.zeros( (self.NVAR , N + 2 * Ng ) , dtype=np.float64 )
+        self.cons_vars = ['density','velocity','energy']
 
     def get_scratch_array( self ):
         return( np.zeros( (self.NVAR, self.N + 2 * self.Ng ) , dtype=np.float64 ) )
 
-    def fill_BCs( self , U ):
+    def fill_BCs( self ):
         """ fill ghostcells """
         # see if 1d burgers
         try:
-            NVAR = U.shape[1]
-        # if not, make sure BCs know 
+            NVAR = self.U.shape[0]
+        # if not, make sure BCs know
         except:
             NVAR = 1
 
         if self.bc == "periodic":
-            # if 1 variable 
+            # if 1 variable
             if NVAR == 1:
-                # left boundary 
-                U[ 0 : self.ilo ] = U [ self.ihi - self.Ng + 1 : \
+                # left boundary
+                self.U[ 0 : self.ilo ] = self.U [ self.ihi - self.Ng + 1 : \
                                         self.ihi + 1 ]
-                # right boundary 
-                U[ self.ihi + 1 : ] = U [ self.ilo : \
+                # right boundary
+                self.U[ self.ihi + 1 : ] = self.U [ self.ilo : \
                                           self.ilo + self.Ng ]
-                                    
+
             # if not, multiple variables
             else:
                 # left boundary
-                U[ : , 0 : self.ilo ] = U[ : , self.ihi - self.Ng + 1 : \
+                self.U[ : , 0 : self.ilo ] = self.U[ : , self.ihi - self.Ng + 1 : \
                                                self.ihi + 1 ]
 
-                # right boundary 
-                U[ : , self.ihi + 1 : ] = U[ : , self.ilo : \
+                # right boundary
+                self.U[ : , self.ihi + 1 : ] = self.U[ : , self.ilo : \
                                                  self.ilo + self.Ng ]
 
         elif self.bc == "outflow":
             # if 1 variable
             if NVAR == 1:
-                U[ 0 : self.ilo ] = U[ self.ilo ]
-                U[ self.ihi + 1 : ] = U[ self.ihi ]
+                self.U[ 0 : self.ilo ] = self.U[ self.ilo ]
+                self.U[ self.ihi + 1 : ] = self.U[ self.ihi ]
             else:
-                # left boundary 
+                # left boundary
                 for i in range(NVAR):
                     self.U[ i , 0 : self.ilo ] = self.U[ i , self.ilo ]
 
-                # right boundary 
+                # right boundary
                 for i in range(NVAR):
                     self.U[ i , self.ihi + 1 : ] = self.U[ i , self.ihi ]
 
         else:
             sys.exit("invalid BC")
-
-
