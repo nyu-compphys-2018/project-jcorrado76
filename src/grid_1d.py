@@ -59,7 +59,7 @@ class Grid1d_Euler( Grid1d ):
         self.U = np.zeros( (self.NVAR , self.grid_size ) , dtype=np.float64 )
         # primitive variables
         self.W = np.zeros( (self.NVAR , self.grid_size ) , dtype=np.float64 )
-        self.cons_vars = ['density','velocity','energy']
+        self.cons_vars = [r'$\rho$',r'$v$',r'$E$']
 
     def get_scratch_array( self ):
         return( np.zeros( (self.NVAR, self.grid_size ) , dtype=np.float64 ) )
