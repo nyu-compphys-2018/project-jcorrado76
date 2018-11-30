@@ -256,7 +256,7 @@ class EulerSolver:
         return LU
 
     def plot(self,title="",color='k'):
-        labels = ['Density','Velocity','Pressure']
+        labels = [r'$\rho$',r'$v$',r'$P$']
         fig, axes = plt.subplots(nrows=3,ncols=1, sharex=True)
         if title == "":
             title = "Sod Shock Tube Simulation"
@@ -265,10 +265,10 @@ class EulerSolver:
         fig.suptitle( title ,fontsize=16)
         for i, axis in enumerate(axes):
             axis.plot( self.x , self.W[i,:], label=labels[i])
-            axis.set_xlabel("x")
             axis.set_title(labels[i])
             axis.grid(True)
             axis.legend()
+        plt.xlabel('x')
         return (axes)
 
 
