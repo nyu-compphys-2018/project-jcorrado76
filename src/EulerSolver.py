@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from eulerExact import riemann
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
@@ -79,6 +80,10 @@ class EulerSolver:
         self.U[0,:] = rho
         self.U[1,:] = rho * self.v
         self.U[2,:] = total_energy( p , rho , self.v , self.gamma)
+
+    def setSmoothWave( self ):
+        print("Hello world")
+
 
     def update_sound_speed(self):
         self.cs = np.sqrt( self.gamma * self.W[2,:] / self.W[0,:] )
@@ -258,22 +263,49 @@ class EulerSolver:
             axis.legend()
         return (axes)
 
-    def plot_convergence( self ):
-        """
-        this function plots the convergence rate of then
-        scheme
-        """
-        Ns = [ 32 , 64 , 128 , 256 , 512 ]
-
 
 def minmod( x , y , z ):
     return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
             (np.sign(x) + np.sign(z)) * \
             min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 
+def plot_convergence():
+    """
+    this function plots the convergence rate of then
+    scheme
+    """
+    Ns = [ 32 , 64 , 128 , 256 , 512 ]
+    t=0.1
+    x0=0.5
+    rhol = 1.0; vl = 0.0; pl = 1.0
+    rhor = 0.1; vr = 0.0; pr = 0.125
+    gamma=1.4
+    L1 = np.zeros( len(Ns) )
+    for i in range(len(Ns)):
+        e = EulerSolver(Nx = Ns[i])
+        e.setSod()
+        e.evolve(t)
+        xexact , rexact , vexact , pexact = riemann( 0. , 1.0 , x0 , Ns[i] , t ,\
+        rhol ,vl , pl , rhor , vr , pr , gamma )
+
+        L1[i] = np.sum(np.fabs( e.U[0,:] - rexact ))
+
+    m , b = np.polyfit( np.log10( Ns[1:] ) , np.log10( L1[1:]) , 1 )
+    fig = plt.figure()
+    plt.plot( np.log10( Ns ) , np.log10( L1 ) , color='red',label='Empirical L1 Error')
+    print("m: {}".format(m))
+    print("b: {}".format(b))
+    print("L1 Errors:" , L1)
+    print("Ns: " , Ns )
+    plt.title("Convergence Plot for Sod Shock Tube")
+    plt.xlabel("$log_{10}(N)$")
+    plt.ylabel("$log_{10}(N)$")
+    plt.legend()
+
 if __name__=="__main__":
-    e = EulerSolver( 512 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     e.setSod()
     e.evolve(0.1)
     e.plot()
+    # plot_convergence()
     plt.show()
