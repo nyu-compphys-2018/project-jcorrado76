@@ -11,7 +11,7 @@ def main():
     # physical index alias
     physical = g.physical
     # Assign initial conditions
-    initial_condition = "sine"
+    initial_condition = "sod"
     ICs = IC_Manager( g )
     ICs.set_ICs(initial_condition)
     # initialize simulation object with ICs in place

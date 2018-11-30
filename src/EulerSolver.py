@@ -229,7 +229,6 @@ class EulerSolver:
 
             #FHLL =
             #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
-            # TODO: calculate FHLL in vectoried way
             FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[0,1:] - self.UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
             FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*( self.UIR[1,1:] - self.UIL[1,:-1]) ) / (ap[1:-1] + am[1:-1])
             FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[2,1:] - self.UIL[2,:-1]) ) / (ap[1:-1] + am[1:-1])
@@ -310,9 +309,14 @@ def plot_convergence():
 
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
-    e.setSod()
-    # e.setSmoothWave()
+    # e.setSod()
+    e.setSmoothWave()
+    winit = e.W.copy()
     e.evolve(0.1)
-    e.plot()
+    axes = e.plot()
+    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
+    for i, axis in enumerate(axes):
+        axis.plot( e.x , winit[i,:], label=init_labels[i])
+        axis.legend()
     # plot_convergence()
     plt.show()

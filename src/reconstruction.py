@@ -17,11 +17,12 @@ def shifted(s, x):
     # returns slice shifted by x
     return slice(s.start + x, s.stop + x)
 
-    
+
 class State_Reconstructor( object ):
     def __init__(self, grid,type='minmod'):
         self.grid=grid
         slope = g.get_scratch_array()
+
     def compute_states(self,dt):
         reconstruction = slice(g.ilo-1,g.ihi+2)
         if self.type == "godunov":
@@ -99,27 +100,23 @@ class State_Reconstructor( object ):
 
             return ul , ur
 
-
-
-
-
-def TVD_Reconstruction( self ):
-    """ minmod slope limiter """
-    g = self.grid
-    UL = g.get_scratch_array()
-    UR = g.get_scratch_array()
-    Ujm1 = U[:,shifted(g.physical,-1)]
-    Uj   = U[:,g.physical]
-    Ujp1 = U[:,shifted(g.physical,1)]
-    sp = Ujp1 - Uj
-    sm = Uj - Ujm1
-    ssp = np.sign(sp)
-    ssm = np.sign(sm)
-    asp = np.abs( sp )
-    asm = np.abs( sm )
-    dU = 0.25 * ( ssp + ssm ) * np.minimum( asp , asm )
-    Ujp = Uj + dU
-    Ujm = Uj - dU
-    UL[:,g.physical] = Ujp
-    UR[:,shifted(g.physical,-1)] = Ujm
-    return UL, UR
+        def textbook_minmod( self ):
+            """ minmod slope limiter """
+            g = self.grid
+            UL = g.get_scratch_array()
+            UR = g.get_scratch_array()
+            Ujm1 = U[:,shifted(g.physical,-1)]
+            Uj   = U[:,g.physical]
+            Ujp1 = U[:,shifted(g.physical,1)]
+            sp = Ujp1 - Uj
+            sm = Uj - Ujm1
+            ssp = np.sign(sp)
+            ssm = np.sign(sm)
+            asp = np.abs( sp )
+            asm = np.abs( sm )
+            dU = 0.25 * ( ssp + ssm ) * np.minimum( asp , asm )
+            Ujp = Uj + dU
+            Ujm = Uj - dU
+            UL[:,g.physical] = Ujp
+            UR[:,shifted(g.physical,-1)] = Ujm
+            return UL, UR

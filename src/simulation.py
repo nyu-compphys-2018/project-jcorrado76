@@ -17,11 +17,12 @@ class Simulation( object ):
         return( self.CFL * self.grid.dx / self.max_lambda() )
 
     def max_lambda( self ):
+        """ return maximum relativistic eigenvalue """
         rho = self.grid.U[0,:]
         v = self.grid.U[1,:]/rho
         p = (self.gamma-1.0)*(self.grid.U[2,:]-rho*v*v/2.)
         cs = self.compute_soundspeed( p , rho )
-        return( max(np.abs(v)+cs))
+        return( max( (np.abs(v)+cs)/(1-v*cs) ) )
 
     def cons_to_prim( self , U ):
         q = self.g.get_scratch_array()
@@ -94,7 +95,7 @@ class Simulation( object ):
 
     # TODO: Need to write 3 separate flux functions in here
     # TODO: Need to compute HLL flux in here
-    def riemann( self , ul , ur ):
+    def advective_flux( self , ul , ur ):
         """
         computes flux
         solve the riemann problem given the left and right states
@@ -136,7 +137,14 @@ class Simulation( object ):
         unew[ : , g.physical ] = \
                 g.U[ : , g.physical ] + \
                 dt / g.dx * ( flux[ : , g.physical ] - flux[ : , shifted(g.physical,1) ] )
+        return( unew )
 
+    def rk3_update( self , dt , flux ):
+        g = self.grid
+        unew = g.get_scratch_array()
+        unew[ : , g.physical ] = \
+                g.U[ : , g.physical ] + \
+                dt / g.dx * ( flux[ : , g.physical ] - flux[ : , shifted(g.physical,1) ] )
         return( unew )
 
     def states(self, dt):
@@ -195,14 +203,28 @@ class Simulation( object ):
             if ( self.t + dt > tmax ): # if we're about to overstep
                 dt = tmax - self.t     # don't
             self.t += dt
-            # start rk4 substeps, then sweep in spatial direction, reconstructing boundary
-            # states, etc.
 
+            # rk3 substeps
+            # U0 = self.U
+            # udot = self.LU()
+            # self.U = U0 + dt * udot
+            # self.update_primitive_variables()
+            # U1 = self.U
+            # udot = self.LU()
+            # self.U = 3./4. * U0 + 1./4. * U1 + 1./4. * dt * udot
+            # self.update_primitive_variables()
+            # U2 = self.U
+            # udot = self.LU()
+            # self.U = 1./3. * U0 + 2./3. * U2 + 2./3. * dt * udot
+
+            # THESE ARE DONE INSIDE LU------------
             # compute interface states
             ul , ur = self.states(dt)
 
+            flux =
+
             # solve riemann problem
-            flux = self.riemann( ul , ur )
+            # flux = self.advective_flux( ul , ur )
 
             # do conservative update
             unew = self.update( dt , flux )
