@@ -150,6 +150,21 @@ class EulerSolver:
                          np.max( np.fabs( self.W[1,:] - self.cs ) )])
         return(dt)
 
+    def Reconstruct_States(self, theta=1.5 ):
+        """ do a tvd reconstruction using generalized minmod slope limiter """
+        for i in range( self.Nx-2 ):
+            UIL[:,i] = self.U[:,i+1] + 0.5 *\
+            minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
+            0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
+            theta * (self.U[:,i+2]-self.U[:,i+1]))
+
+            UIR[:,i] = self.U[:,i+1] - 0.5 *\
+            minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
+            0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
+            theta * (self.U[:,i+2]-self.U[:,i+1]))
+
+        return UIL, UIR
+
     def LU(self):
         # using dirichlet boundary conditions by not updating ghost cells
         # low order in space
@@ -176,26 +191,17 @@ class EulerSolver:
         elif self.spatial_order != 1:
             theta=1.5
             # TODO: make the loop over NVAR, and use vectorized operation in x
-            for i in range( self.Nx-2 ):
-                self.UIL[:,i] = self.U[:,i+1] + 0.5 *\
-                minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
-                0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
-                theta * (self.U[:,i+2]-self.U[:,i+1]))
-
-                self.UIR[:,i] = self.U[:,i+1] - 0.5 *\
-                minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
-                0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
-                theta * (self.U[:,i+2]-self.U[:,i+1]))
+            UIL, UIR = self.Reconstruct_States()
 
             # need to update interpolated values of primitives at boundaries
-            self.WIL[0,:] = self.UIL[0,:]
-            self.WIL[1,:] = self.UIL[1,:] / self.UIL[0,:]
+            self.WIL[0,:] = UIL[0,:]
+            self.WIL[1,:] =  UIL[1,:] /  UIL[0,:]
             self.WIL[2,:] = ( self.gamma - 1.0 ) *\
-                    ( self.UIL[2,:] - 0.5 * self.UIL[1,:]**2 / self.UIL[0,:] )
-            self.WIR[0,:] = self.UIR[0,:]
-            self.WIR[1,:] = self.UIR[1,:] / self.UIR[0,:]
+                    (  UIL[2,:] - 0.5 *  UIL[1,:]**2 /  UIL[0,:] )
+            self.WIR[0,:] =  UIR[0,:]
+            self.WIR[1,:] =  UIR[1,:] /  UIR[0,:]
             self.WIR[2,:] = ( self.gamma - 1.0 ) *\
-                    ( self.UIR[2,:] - 0.5 * self.UIR[1,:]**2 / self.UIR[0,:] )
+                    (  UIR[2,:] - 0.5 *  UIR[1,:]**2 /  UIR[0,:] )
 
             self.csL = (self.gamma * self.WIL[2,:]/self.WIL[0,:])**0.5
             self.csR = (self.gamma * self.WIR[2,:]/self.WIR[0,:])**0.5
@@ -220,9 +226,9 @@ class EulerSolver:
 
             #FHLL =
             #Calculating FHLL at the boundaries 1+0.5, 2+0.5, ... Nx-3+0.5
-            FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[0,1:] - self.UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*( self.UIR[1,1:] - self.UIL[1,:-1]) ) / (ap[1:-1] + am[1:-1])
-            FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*(self.UIR[2,1:] - self.UIL[2,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL1 = ( ap[1:-1]*F1L[:-1] + am[1:-1]*F1R[1:] - ap[1:-1]*am[1:-1]*( UIR[0,1:] -  UIL[0,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL2 = ( ap[1:-1]*F2L[:-1] + am[1:-1]*F2R[1:] - ap[1:-1]*am[1:-1]*(  UIR[1,1:] -  UIL[1,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL3 = ( ap[1:-1]*F3L[:-1] + am[1:-1]*F3R[1:] - ap[1:-1]*am[1:-1]*( UIR[2,1:] -  UIL[2,:-1]) ) / (ap[1:-1] + am[1:-1])
 
             LU = np.zeros((3,self.Nx))
 
