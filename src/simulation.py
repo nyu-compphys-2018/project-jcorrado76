@@ -214,6 +214,6 @@ if __name__ == "__main__":
 
     plt.xlabel("$x$")
     # plt.ylabel("$u$")
-    plt.savefig("fv-burger-{}.pdf".format( initial_condition ) )
+    plt.savefig("plots/fv-burger-{}.pdf".format( initial_condition ) )
     plt.suptitle("Solution for {} wave".format(initial_condition))
     plt.show()
