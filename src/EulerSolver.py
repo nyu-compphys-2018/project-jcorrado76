@@ -75,12 +75,15 @@ class EulerSolver:
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** self.gamma
-        self.cs = np.sqrt( self.gamma * p / rho )
-        self.v = (2. / (self.gamma-1.) ) * (self.cs- np.sqrt(self.gamma*p/rho))
+        self.cs = self.get_sound_speed(rho ,p)
+        v = (2. / (self.gamma-1.) ) * (self.cs - self.get_sound_speed(rho0,p0))
 
         self.U[0,:] = rho
-        self.U[1,:] = rho * self.v
-        self.U[2,:] = total_energy( p , rho , self.v , self.gamma)
+        self.U[1,:] = rho * v
+        self.U[2,:] = ( p / (self.gamma-1.))+(rho*v*v/2.)
+        self.W[0,:] = rho
+        self.W[1,:] = v
+        self.W[2,:] = p
 
     def setSmoothWave( self ):
         self.W[0,:] = np.sin(2 * np.pi * self.x)
@@ -307,10 +310,15 @@ def plot_convergence():
     plt.ylabel("$log_{10}(N)$")
     plt.legend()
 
+def f(x,x0,sigma):
+    return(np.where(abs(x-x0)<sigma , (1-((x-x0)/sigma)**2)**2 , 0))
+
 if __name__=="__main__":
     e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     # e.setSod()
-    e.setSmoothWave()
+    # e.setSmoothWave()
+    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    e.setInitialWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve(0.1)
     axes = e.plot()
