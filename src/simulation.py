@@ -221,10 +221,8 @@ class Simulation( object ):
             # compute interface states
             ul , ur = self.states(dt)
 
-            flux =
-
             # solve riemann problem
-            # flux = self.advective_flux( ul , ur )
+            flux = self.advective_flux( ul , ur )
 
             # do conservative update
             unew = self.update( dt , flux )
