@@ -125,7 +125,7 @@ class EulerSolver:
 
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
-        W = np.zeros((3,Nx))
+        W = np.zeros((3,self.Nx))
         W[0,:] = self.U[0,:]
         W[1,:] = self.U[1,:] / self.U[0,:]
         W[2,:] = ( self.gamma - 1.0 ) *\
@@ -171,6 +171,8 @@ class EulerSolver:
     def Reconstruct_States(self, theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
         # TODO: this is slow because it loops over Nx
+        UIL = np.zeros((3,self.Nx-2))
+        UIR = np.zeros((3,self.Nx-2))
         for i in range( self.Nx-2 ):
             UIL[:,i] = self.U[:,i+1] + 0.5 *\
             minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
@@ -207,8 +209,6 @@ class EulerSolver:
 
             WIL = self.cons_to_prim( UIL )
             WIR = self.cons_to_prim( UIR )
-
-            get_sound_speed(self, r , p)
 
             csL = self.get_sound_speed( WIL[0,:], WIL[2,:] )
             csR = self.get_sound_speed( WIR[0,:], WIR[2,:] )
@@ -296,7 +296,7 @@ def f(x,x0,sigma):
 
 if __name__=="__main__":
     t = 0.1
-    e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
     e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
