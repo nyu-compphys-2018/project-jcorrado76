@@ -1,37 +1,27 @@
 from grid_1d import Grid1d_Euler
-
+from reconstruction import State_Reconstructor,shifted
 import numpy as np
 
-def minmod( a , b ):
-    if abs(a) < abs(b) and a * b > 0.0:
-        return a
-    elif abs(b) < abs(a) and a * b > 0.0:
-        return b
-    else:
-        return 0.0
-def maxmod( a , b ):
-    if abs(a) > abs(b) and a * b > 0.0:
-        return a
-    elif abs(b) < abs(a) and a * b > 0.0:
-        return b
-    else:
-        return 0.0
-def shifted(s, x):
-    # returns slice shifted by x 
-    return slice(s.start + x: s.stop + x)
-
-
+def minmod( x , y , z ):
+    return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
+            (np.sign(x) + np.sign(z)) * \
+            min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 class Simulation( object ):
-    def __init__( self , grid ):
+    def __init__( self , grid , CFL=0.8 , gamma=1.4 ):
         self.grid = grid
         self.t = 0.0
+        self.gamma=gamma
+        self.CFL=CFL
 
-    # TODO: this needs to depend on eigenvalues; alphas, not just the velocities
-    # but I will only put velocities here to get the structure correct
-    def compute_timestep( self , CFL ):
-        return( CFL * self.grid.dx / \
-                max( abs( self.grid.U[ 1 , self.grid.ilo :\
-                self.grid.ihi + 1 ] ) ) )
+    def compute_timestep( self ):
+        return( self.CFL * self.grid.dx / self.max_lambda() )
+
+    def max_lambda( self ):
+        rho = self.grid.U[0,:]
+        v = self.grid.U[1,:]/rho
+        p = (self.gamma-1.0)*(self.grid.U[2,:]-rho*v*v/2.)
+        cs = self.compute_soundspeed( p , rho )
+        return( max(np.abs(v)+cs))
 
     def cons_to_prim( self , U ):
         q = self.g.get_scratch_array()
@@ -51,52 +41,56 @@ class Simulation( object ):
 
         return q
 
-    def states( self , dt ):
-        """ reconstruct left and right interface states
-            implemented:
-            minmod
+    def compute_soundspeed( self , p , rho ):
+        return np.sqrt( self.gamma * p / rho )
 
-            not implemented:
-            godunov
-            centered
-            MC
-            superbee
-        """
+    # lambdal and lambdar are computed after left and right primitive states are obtained
+    def lambdaL( self , WL ):
+        """ 1D relativistic maximal eigval """
+        v = WL[1,:]
+        cs = compute_soundspeed(WL[2,:],WL[0,:])
+        return (v + cs)/(1+v*cs)
+
+    def lambdaR( self , WR ):
+        """ 1D relativistic minimal eigval """
+        v = WR[1,:]
+        cs = compute_soundspeed(WR[2,:],WL[0,:])
+        return (v - cs)/(1+v*cs)
+
+    def euler_flux( self , U ):
+        """ compute basic euler flux from conservative variables """
         g = self.grid
+        flux = g.get_scratch_array()
+        rho = U[0,:]
+        rhov = U[1,:]
+        E = U[2,:]
+        v = rhov / rho
+        p = (self.gamma - 1.) * ( E - rho * v * v / 2. )
 
-        # compute piecewise linear slopes -- 2nd order MC limiter
-        # pick a range of cells that includes 1 ghost cell on either side
-        ie = g.ihi + 1
+        flux[0,:] = rhov
+        flux[1,:] = rhov * v + p
+        flux[2,:] = ( E + p ) * v
+        return flux
 
-        U = g.U
+    def reconstruct_states( self ):
+        g = self.grid
+        UL = g.get_scratch_array()
+        UR = g.get_scratch_array()
+        i = slice(0,g.N-2)
+        theta=1.5
+        for var in range(g.NVAR):
+            UL[var,i] = g.U[var,shifted(i,1)] + 0.5 *\
+            minmod( theta * ( g.U[var,shifted(i,1)]-g.U[var,i]),\
+            0.5 * ( g.U[var,shifted(i,2)]-g.U[var,i] ) ,\
+            theta * (g.U[var,shifted(i,2)]-g.U[var,shifted(i,1)]))
 
-        dc = g.get_scratch_array()
-        dl = g.get_scratch_array()
-        dr = g.get_scratch_array()
+            UR[var,i] = g.U[var,shifted(i,1)] - 0.5 *\
+            minmod( theta * ( g.U[var,shifted(i,1)]-g.U[var,i]),\
+            0.5 * ( g.U[var,shifted(i,2)]-g.U[var,i] ) ,\
+            theta * (g.U[var,shifted(i,2)]-g.U[var,shifted(i,1)]))
 
-        dc[ : , g.ilo-1:ie+1] = 0.5* ( U[ : , g.ilo : ie+2 ] - U[ : , g.ilo-2 : ie ] )
-        dl[ : , g.ilo-1:ie+1] = U[ : , g.ilo-1+1 : ie+2 ] - U[ : , g.ilo-1 : ie+1 ]
-        dr[ : , g.ilo-1:ie+1] = U[ : , g.ilo-1 : ie+1 ] - U[ : , g.ilo-2 : ie ]
+        return UL,UR
 
-
-        # minmod
-        d1 = 2.0 * np.where( np.fabs( dl ) < np.fabs( dr ) , dl , dr )
-        d2 = np.where( np.fabs( dc ) < np.fabs( d1 ) , dc , d1 )
-        ldeltau = np.where( dl * dr > 0.0 , d2 , 0.0 )
-
-        # now interface states. there is one more interface than zones
-        ul = g.get_scratch_array()
-        ur = g.get_scratch_array()
-
-        ur[ : , g.ilo-1 : ie + 2 ] = U[ : , g.ilo-1 : ie + 2 ] - \
-                0.5 * ( 1.0 + U[ : , g.ilo-1 : ie+2 ] * dt / self.grid.dx ) * \
-                ldeltau[ : , g.ilo-1 : ie+2 ]
-
-        ul[ : , g.ilo : ie+2 ] = U[ : , g.ilo-1 : ie+1 ] +\
-                0.5 * ( 1.0 - U[ : , g.ilo-1 : ie+1 ] * dt / self.grid.dx ) * \
-                ldeltau[ : , g.ilo-1 : ie+1 ]
-
-        return ul , ur
 
     # TODO: Need to write 3 separate flux functions in here
     # TODO: Need to compute HLL flux in here
@@ -105,7 +99,6 @@ class Simulation( object ):
         solve the riemann problem given the left and right states
         returns flux at interfaces, given left and right states
         implemented:
-        upwinding
         HLL
 
         """
@@ -146,25 +139,68 @@ class Simulation( object ):
 
         return( unew )
 
-    def evolve( self , C , tmax ):
-        # set time to zero
-        self.t = 0.0
+    def states(self, dt):
+        """ compute the left and right interface states """
 
-        # alias for access to grid
         g = self.grid
+        # compute the piecewise linear slopes -- 2nd order MC limiter
+        # we pick a range of cells that includes 1 ghost cell on either
+        # side
+        ib = g.ilo-1
+        ie = g.ihi+1
 
+        u = g.U
+
+        # this is the MC limiter from van Leer (1977), as given in
+        # LeVeque (2002).  Note that this is slightly different than
+        # the expression from Colella (1990)
+
+        dc = g.get_scratch_array()
+        dl = g.get_scratch_array()
+        dr = g.get_scratch_array()
+
+        dc[:,ib:ie+1] = 0.5*(u[:,ib+1:ie+2] - u[:,ib-1:ie  ])
+        dl[:,ib:ie+1] = u[:,ib+1:ie+2] - u[:,ib  :ie+1]
+        dr[:,ib:ie+1] = u[:,ib  :ie+1] - u[:,ib-1:ie  ]
+
+        # these where's do a minmod()
+        d1 = 2.0*np.where(np.fabs(dl) < np.fabs(dr), dl, dr)
+        d2 = np.where(np.fabs(dc) < np.fabs(d1), dc, d1)
+        ldeltau = np.where(dl*dr > 0.0, d2, 0.0)
+
+        # now the interface states.  Note that there are 1 more interfaces
+        # than zones
+        ul = g.get_scratch_array()
+        ur = g.get_scratch_array()
+
+        # are these indices right?
+        #
+        #  --+-----------------+------------------+
+        #     ^       i       ^ ^        i+1
+        #     ur(i)     ul(i+1) ur(i+1)
+        #
+        ur[:,ib:ie+2] = u[:,ib:ie+2] - \
+                      0.5*(1.0 + u[:,ib:ie+2]*dt/self.grid.dx)*ldeltau[:,ib:ie+2]
+
+        ul[:,ib+1:ie+2] = u[:,ib:ie+1] + \
+                        0.5*(1.0 - u[:,ib:ie+1]*dt/self.grid.dx)*ldeltau[:,ib:ie+1]
+
+        return ul, ur
+
+    def evolve( self , tmax ):
+        self.t = 0.0
+        g = self.grid # alias
         while( self.t < tmax ):
-            # fill boundary conditions
-            g.fill_BCs()
+            dt = self.compute_timestep()
+            if ( self.t + dt > tmax ): # if we're about to overstep
+                dt = tmax - self.t     # don't
+            self.t += dt
+            # start rk4 substeps, then sweep in spatial direction, reconstructing boundary
+            # states, etc.
 
-            # get the timestep
-            dt = self.compute_timestep( C )
-
-            if ( self.t + dt > tmax ):
-                dt = tmax - self.t
 
             # compute interface states
-            ul , ur = self.states( dt )
+            ul , ur = self.states(dt)
 
             # solve riemann problem
             flux = self.riemann( ul , ur )
@@ -175,7 +211,7 @@ class Simulation( object ):
 
             # TODO: update primitives after conservative update
 
-            self.t += dt
+            g.fill_BCs()
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt

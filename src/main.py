@@ -15,12 +15,12 @@ def main():
     ICs = IC_Manager( g )
     ICs.set_ICs(initial_condition)
     # initialize simulation object with ICs in place
-    s = Simulation( g )
+    s = Simulation( g , CFL=CFL )
     # Save initial conditions
     uinit = s.grid.U.copy()
     winit = s.grid.W.copy()
     # evolve forward in time
-    s.evolve( CFL , tmax )
+    s.evolve( tmax )
     # get the final values of variables that live on grid
     g = s.grid
     # plot them

@@ -11,6 +11,7 @@ class Grid1d( object ):
         self.ihi = Ng + N - 1
         self.dx = (xmax - xmin) / N
         self.grid_size = N + 2 * Ng
+        # these xs are the x values at centers of cells
         self.xs = xmin + \
                 (np.arange( N + 2 * Ng ) - Ng + 0.5 ) * self.dx
         self.U = np.zeros( self.grid_size , dtype=np.float64 )
@@ -41,7 +42,6 @@ class Grid1d( object ):
 
         else:
             sys.exit("invalid BC")
-
 class Grid1d_Euler( Grid1d ):
     def __init__( self , N , Ng , xmin=0.0 , xmax=1.0 , bc='outflow' ):
         # call constructor of parent
