@@ -121,11 +121,13 @@ class EulerSolver:
         return(1./np.sqrt(1-self.W[1,:]**2))
 
     def prim_to_cons( self , W ):
+        """ compute relativistic conserved variables """
         U = np.zeros((3,self.Nx))
-        U[0,:] = W[0,:] # set initial density
-        U[1,:] = W[0,:] * W[1,:]
-        U[2,:] = 0.5 * W[0,:] * W[1,:]**2 + \
-                W[2,:] / (self.gamma - 1.0)
+        specific_internal_energy = W[2,:]/(W[0,:]*(self.gamma-1.))
+        h = 1. + specific_internal_energy + (W[2,:]/W[0,:])
+        U[0,:] = self.lorentz()*W[0,:] # set initial density
+        U[1,:] = W[0,:] * W[1,:] * h * self.lorentz()**2
+        U[2,:] = W[0,:]*h*self.lorentz()**2-W[2,:]-self.lorentz()*W[0,:]
         return U
 
     def evolve(self, tfinal):
