@@ -279,7 +279,7 @@ if __name__=="__main__":
     # add the initial configurations on each subplot
     init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
     for i, axis in enumerate(axes):
-        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.2)
+        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
     # do convergence plot
