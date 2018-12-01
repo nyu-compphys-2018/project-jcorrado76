@@ -203,6 +203,7 @@ class EulerSolver:
 
     def LU(self):
         # using dirichlet boundary conditions by not updating ghost cells
+        LU = np.zeros((3,self.Nx))
         ap = np.empty( self.Nx - 1 )
         am = np.empty( self.Nx - 1 )
         if self.spatial_order == 1:
@@ -213,14 +214,8 @@ class EulerSolver:
             am = np.maximum( 0 , -self.W[1,indices] + cs[indices] )
             am = np.maximum( am , -self.W[1,indices+1] + cs[indices+1])
 
-            UL = self.U[:,:-1]
-            UR = self.U[:,1:]
-
             F = self.Euler_Flux( self.W )
-            FL = F[:,:-1]
-            FR = F[:,1:]
-
-            LU[:,:] = self.HLLE_Flux( UL , UR , FL , FR , am , ap )
+            LU[:,:] = self.getLU( self.U , F , ap , am )
 
         elif self.spatial_order != 1:
             LU = np.zeros((3,self.Nx))
@@ -239,7 +234,11 @@ class EulerSolver:
 
         return LU
 
-    def getLU( self , U , ap , am ):
+    def getLU( self , U , F , ap , am ):
+        UL = U[:,:-1]
+        UR = U[:,1:]
+        FL = F[:,:-1]
+        FR = F[:,1:]
         FHLL = ( ap * FL + am * FR - ap * am * ( UR - UL )) / (ap+am)
         LU = np.zeros((3,self.Nx))
         LU[:,1:-1] = -(FHLL[:,1:]-FHLL[:,:-1]) / self.dx
@@ -265,7 +264,7 @@ if __name__=="__main__":
     # final time
     t = 0.2
     # initialize euler solver object
-    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
+    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
