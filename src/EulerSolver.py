@@ -270,7 +270,6 @@ class EulerSolver:
         plt.xlabel('x')
         return (axes)
 
-
 def minmod( x , y , z ):
     return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
             (np.sign(x) + np.sign(z)) * \
@@ -306,9 +305,10 @@ def plot_convergence(order='low'):
     rerr = []
     verr = []
     perr = []
-    deltaX = ()
+
     L1 = np.zeros( len(Ns) )
     for i in range(len(Ns)):
+        deltaX = (b-a)/Ns[i]
         if order=='low':
             e = EulerSolver(Nx = Ns[i],time_order=1,spatial_order=1)
         else:
@@ -320,10 +320,14 @@ def plot_convergence(order='low'):
         verr.append( compute_l1_error( e.W[1,:] , vexact , deltaX ))
         perr.append( compute_l1_error( e.W[2,:] ,   pexact , deltaX ))
 
+    print("L1 Errors on Density",rerr)
+    print("L1 Errors on Velocity",verr)
+    print("L1 Errors on Pressure",perr)
+
     logns = np.log( Ns )
-    logrs = -np.log( rerr )
-    logvs = -np.log( verr )
-    logps = -np.log( perr )
+    logrs = np.log( rerr )
+    logvs = np.log( verr )
+    logps = np.log( perr )
 
     rb , rm = fit_line( logns , logrs )
     vb , vm = fit_line( logns , logvs )
@@ -334,9 +338,14 @@ def plot_convergence(order='low'):
     print("Pressure slope:" , pm)
 
     fig = plt.figure()
-    plt.plot( logns , line(logrs) , color='red' , label='L1 Error on Density')
-    plt.plot( logns , line(logvs) , color='green' , label='L1 Error on Velocity')
-    plt.plot( logns , line(logps) , color='blue' , label='L1 Error on Pressure')
+
+    plt.plot( logns, logrs , color='red' , marker='o',label="L1 Error on Density")
+    plt.plot( logns, logvs , color='green' , marker='o',label="L1 Error on Velocity")
+    plt.plot( logns, logps , color='blue' , marker='o',label="L1 Error on Pressure")
+
+    plt.plot( logns , line(logns , rb , rm ) , linestyle='dashed', color='red' , label='L1 Error Fit on Density')
+    plt.plot( logns , line(logns , vb , vm ) , linestyle='dashed',color='green' , label='L1 Error Fit on Velocity')
+    plt.plot( logns , line(logns , pb , pm ) , linestyle='dashed',color='blue' , label='L1 Error Fit on Pressure')
 
     plt.title("Convergence Plot for Sod Shock Tube")
     plt.xlabel("$log(N)$")
