@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
-from numpy.polynomial.polynomial import polyfit
+
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):

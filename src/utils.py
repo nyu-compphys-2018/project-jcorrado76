@@ -1,3 +1,7 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.polynomial.polynomial import polyfit
+
 def minmod( x , y , z ):
     return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
             (np.sign(x) + np.sign(z)) * \
