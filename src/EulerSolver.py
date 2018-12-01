@@ -109,11 +109,11 @@ class EulerSolver:
 
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
-        W = np.zeros((3,self.Nx))
-        W[0,:] = self.U[0,:]
-        W[1,:] = self.U[1,:] / self.U[0,:]
+        W = np.zeros(U.shape)
+        W[0,:] = U[0,:]
+        W[1,:] = U[1,:] / U[0,:]
         W[2,:] = ( self.gamma - 1.0 ) *\
-                ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
+                ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
         return W
 
     def prim_to_cons( self , W ):
@@ -130,13 +130,11 @@ class EulerSolver:
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
                 dt = tfinal - self.t # don't
-            # if order in time is 1
             if self.time_order == 1:
                 udot = self.LU()
                 # use forward euler
                 self.update_conservative_variables_forward_euler( dt , udot )
                 self.update_primitive_variables()
-            # if higher order in time
             elif self.time_order != 1:
                 # use RK3
                 self.update_conservative_variables_RK3(dt)
@@ -154,7 +152,7 @@ class EulerSolver:
             0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
         return flux
 
-    def HLLE_Flux( self , UIL, UIR , FL , FR , am , ap ):
+    def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
         # need Nx + 1 fluxes because Nx +1 interfaces
         # thats why everything on rhs has len 997 ( we have N=1000 )
         # i added 1 to start and stop of FL and FR because that array actually
@@ -164,7 +162,7 @@ class EulerSolver:
         FHLL = np.zeros((3,self.Nx-3))
         LU = np.zeros((3,self.Nx))
         for i in range(3):
-            FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UIR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
+            FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
             LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
         return LU
 
@@ -202,16 +200,22 @@ class EulerSolver:
         ap = np.empty( self.Nx - 1 )
         am = np.empty( self.Nx - 1 )
         if self.spatial_order == 1:
-            self.get_sound_speed(self.W[0,:],self.W[2,:])
-
+            cs = self.get_sound_speed(self.W[0,:],self.W[2,:])
             indices = np.arange( self.Nx - 1 )
-            ap = np.maximum( 0 , self.W[1,indices]+self.cs[indices] )
-            ap = np.maximum( ap , self.W[1,indices+1] + self.cs[indices+1] )
-            am = np.maximum( 0 , -self.W[1,indices] + self.cs[indices] )
-            am = np.maximum( am , -self.W[1,indices+1] + self.cs[indices+1])
+            ap = np.maximum( 0 , self.W[1,indices] + cs[indices] )
+            ap = np.maximum( ap , self.W[1,indices+1] + cs[indices+1] )
+            am = np.maximum( 0 , -self.W[1,indices] + cs[indices] )
+            am = np.maximum( am , -self.W[1,indices+1] + cs[indices+1])
 
-            self.F[:,:] = self.Euler_Flux( self.W )
-            LU = self.getLU( self.U , ap , am )
+            UL = self.U[:,:-1]
+            UR = self.U[:,1:]
+
+            F = self.Euler_Flux( self.W )
+            FL = F[:,:-1]
+            FR = F[:,1:]
+
+            LU[:,:] = self.HLLE_Flux( UL , UR , FL , FR , am , ap )
+
         elif self.spatial_order != 1:
             LU = np.zeros((3,self.Nx))
             UIL, UIR = self.Reconstruct_States()
@@ -230,10 +234,6 @@ class EulerSolver:
         return LU
 
     def getLU( self , U , ap , am ):
-        FL = self.F[:,:-1]
-        FR = self.F[:,1:]
-        UL = U[:,:-1]
-        UR = U[:,1:]
         FHLL = ( ap * FL + am * FR - ap * am * ( UR - UL )) / (ap+am)
         LU = np.zeros((3,self.Nx))
         LU[:,1:-1] = -(FHLL[:,1:]-FHLL[:,:-1]) / self.dx
@@ -244,7 +244,7 @@ class EulerSolver:
         fig, axes = plt.subplots(nrows=3,ncols=1, sharex=True)
         if title == "":
             title = "Sod Shock Tube Simulation"
-        title += " time t={}".format(self.tfinal)
+        title += " to time t={}".format(self.tfinal)
 
         fig.suptitle( title ,fontsize=16)
         for i, axis in enumerate(axes):
@@ -257,12 +257,13 @@ class EulerSolver:
 
 if __name__=="__main__":
     # final time
-    t = 0.1
+    t = 0.2
     # initialize euler solver object
     e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
+    title="Sod"
     # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
     # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     # save initial configuration
@@ -270,11 +271,11 @@ if __name__=="__main__":
     # evolve to final time
     e.evolve( t )
     # plot the euler solver and capture resultant axes
-    axes = e.plot()
+    axes = e.plot(title=title)
     # add the initial configurations on each subplot
     init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
     for i, axis in enumerate(axes):
-        axis.plot( e.x , winit[i,:], label=init_labels[i])
+        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.2)
         axis.legend()
 
     # do convergence plot
