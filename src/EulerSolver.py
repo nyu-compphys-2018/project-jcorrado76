@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
+from numpy.polynomial.polynomial import polyfit
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
@@ -32,7 +33,7 @@ class EulerSolver:
 
         # speed of sound
         self.cs = np.zeros(Nx)
-        self.gamma = 0
+        self.gamma = 1.4
 
         # order in space
         self.spatial_order = spatial_order
@@ -86,7 +87,7 @@ class EulerSolver:
         self.W[2,:] = p
 
     def setSmoothWave( self ):
-        self.W[0,:] = np.sin(2 * np.pi * self.x)
+        self.W[0,:] = np.sin(2 * np.pi * self.x)+2.0
         self.W[1,:] = 0.0
         self.W[2,:] = 1.0
         self.U[0,:] = self.W[0,:] # set initial density
@@ -95,6 +96,13 @@ class EulerSolver:
                 self.W[2,:] / (self.gamma - 1.0)
 
     def get_sound_speed(self, r , p):
+        # let me know if encountering negative pressures
+        if isinstance(p,np.ndarray):
+            if (p < 0.0).any():
+                print("Warning, negative pressure encountered when computing sound speed")
+        else:
+            if p < 0.0:
+                print("Negative pressure encountered when computing sound speed")
         return np.sqrt( self.gamma * p / r )
 
     def update_conservative_variables_RK3(self,dt):
@@ -163,6 +171,7 @@ class EulerSolver:
     def get_dt(self ):
         # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
         self.cs = self.get_sound_speed( self.W[0,:],self.W[2,:])
+
         dt = self.cfl * self.dx / \
                 np.max([ np.max( np.fabs( self.W[1,:] + self.cs ) ) ,\
                          np.max( np.fabs( self.W[1,:] - self.cs ) )])
@@ -267,7 +276,20 @@ def minmod( x , y , z ):
             (np.sign(x) + np.sign(z)) * \
             min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
 
-def plot_convergence():
+def compute_l1_error( numerical , exact , deltaX ):
+    diff = np.abs( numerical - exact )
+    summ = diff.sum()
+    return deltaX * summ
+
+def fit_line( xdata , ydata ):
+    # fit data to a line
+    b, m = polyfit( xdata , ydata , 1 )
+    return b , m
+
+def line( x , b , m ):
+    return m * x + b
+
+def plot_convergence(order='low'):
     """
     this function plots the convergence rate of then
     scheme
@@ -275,29 +297,50 @@ def plot_convergence():
     Ns = [ 32 , 64 , 128 , 256 , 512 ]
     t=0.1
     x0=0.5
+    a=0.0
+    b=1.0
     rhol = 1.0; vl = 0.0; pl = 1.0
     rhor = 0.1; vr = 0.0; pr = 0.125
     gamma=1.4
+
+    rerr = []
+    verr = []
+    perr = []
+    deltaX = ()
     L1 = np.zeros( len(Ns) )
     for i in range(len(Ns)):
-        e = EulerSolver(Nx = Ns[i])
+        if order=='low':
+            e = EulerSolver(Nx = Ns[i],time_order=1,spatial_order=1)
+        else:
+            e = EulerSolver(Nx = Ns[i],time_order=2,spatial_order=2)
         e.setSod()
         e.evolve(t)
-        xexact , rexact , vexact , pexact = riemann( 0. , 1.0 , x0 , Ns[i] , t ,\
-        rhol ,vl , pl , rhor , vr , pr , gamma )
+        xexact , rexact , vexact , pexact = riemann( a , b , x0 , Ns[i] , t ,rhol ,vl , pl , rhor , vr , pr , gamma )
+        rerr.append( compute_l1_error( e.W[0,:] , rexact , deltaX ))
+        verr.append( compute_l1_error( e.W[1,:] , vexact , deltaX ))
+        perr.append( compute_l1_error( e.W[2,:] ,   pexact , deltaX ))
 
-        L1[i] = np.sum(np.fabs( e.U[0,:] - rexact ))
+    logns = np.log( Ns )
+    logrs = -np.log( rerr )
+    logvs = -np.log( verr )
+    logps = -np.log( perr )
 
-    m , b = np.polyfit( np.log10( Ns[1:] ) , np.log10( L1[1:]) , 1 )
+    rb , rm = fit_line( logns , logrs )
+    vb , vm = fit_line( logns , logvs )
+    pb , pm = fit_line( logns , logps )
+
+    print("Density slope:" , rm)
+    print("Velocity slope:" , vm)
+    print("Pressure slope:" , pm)
+
     fig = plt.figure()
-    plt.plot( np.log10( Ns ) , np.log10( L1 ) , color='red',label='Empirical L1 Error')
-    print("m: {}".format(m))
-    print("b: {}".format(b))
-    print("L1 Errors:" , L1)
-    print("Ns: " , Ns )
+    plt.plot( logns , line(logrs) , color='red' , label='L1 Error on Density')
+    plt.plot( logns , line(logvs) , color='green' , label='L1 Error on Velocity')
+    plt.plot( logns , line(logps) , color='blue' , label='L1 Error on Pressure')
+
     plt.title("Convergence Plot for Sod Shock Tube")
-    plt.xlabel("$log_{10}(N)$")
-    plt.ylabel("$log_{10}(N)$")
+    plt.xlabel("$log(N)$")
+    plt.ylabel("$log(L_1)$")
     plt.legend()
 
 def f(x,x0,sigma):
@@ -305,11 +348,11 @@ def f(x,x0,sigma):
 
 if __name__=="__main__":
     t = 0.1
-    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
-    e.setSod()
+    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    # e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve( t )
     axes = e.plot()
@@ -318,5 +361,7 @@ if __name__=="__main__":
     for i, axis in enumerate(axes):
         axis.plot( e.x , winit[i,:], label=init_labels[i])
         axis.legend()
-    # plot_convergence()
+
+    # do convergence plot
+    plot_convergence(order='high')
     plt.show()
