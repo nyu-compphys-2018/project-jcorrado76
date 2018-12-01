@@ -116,6 +116,10 @@ class EulerSolver:
                 ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
         return W
 
+    def lorentz( self ):
+        """ relativistic lorentz factor """
+        return(1./np.sqrt(1-self.W[1,:]**2))
+
     def prim_to_cons( self , W ):
         U = np.zeros((3,self.Nx))
         U[0,:] = W[0,:] # set initial density
