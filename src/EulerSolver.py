@@ -171,6 +171,9 @@ class EulerSolver:
     def Reconstruct_States(self, theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
         # TODO: this is slow because it loops over Nx
+        # even though we have 2 ghost cells on either side, the size of
+        # interpolated states is Nx-2 and not -4 because we will need only one of the
+        # ghost cells on either side to reconstruct a flux at every interface
         UIL = np.zeros((3,self.Nx-2))
         UIR = np.zeros((3,self.Nx-2))
         for i in range( self.Nx-2 ):
@@ -203,7 +206,7 @@ class EulerSolver:
             self.F[:,:] = self.Euler_Flux( self.W )
             LU = self.getLU( self.U , ap , am )
         elif self.spatial_order != 1:
-            FHLL = np.zeros((3,self.Nx))
+            FHLL = np.zeros((3,self.Nx-3))
             LU = np.zeros((3,self.Nx))
             UIL, UIR = self.Reconstruct_States()
 
@@ -220,9 +223,15 @@ class EulerSolver:
             FL = self.Euler_Flux( WIL )
             FR = self.Euler_Flux( WIR )
 
+            # need Nx + 1 fluxes because Nx +1 interfaces
+            # thats why everything on rhs has len 997 ( we have N=1000 )
+            # i added 1 to start and stop of FL and FR because that array actually
+            # has same size as U
+            # when we take FHLL[1:] and FHLL[:-1], that'll yield len 996
+            # which is the Nx - 2 Ng we expected to update all physical cells
             for i in range(3):
-                FHLL[i,:] = ( ap[1:-1]*FL[i,:-1] + am[1:-1]*FR[i,1:] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
-                LU[i,2:,-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+                FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UIR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
+                LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
 
         return LU
 
@@ -296,7 +305,7 @@ def f(x,x0,sigma):
 
 if __name__=="__main__":
     t = 0.1
-    e = EulerSolver( 1000 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
+    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
     e.setSod()
     # e.setSmoothWave()
     rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
