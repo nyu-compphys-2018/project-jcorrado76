@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
-
+from utils import *
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
@@ -23,10 +23,6 @@ class EulerSolver:
         # rho , rhov , energy
         self.U = np.zeros((3,Nx))
 
-        # flux vector
-        # rhov , rhov^2+P , (E+P)v
-        self.F = np.zeros((3,Nx))
-
         # primitives
         # density, velocity, pressure
         self.W = np.zeros((3,Nx))
@@ -40,37 +36,17 @@ class EulerSolver:
         # order in time
         self.time_order=time_order
 
-        # interpolated state values close to the boundaries
-        self.UIL = np.zeros((3,self.Nx-2))
-        self.UIR = np.zeros((3,self.Nx-2))
-        # interpolated primitives values close to the boundaries
-        self.WIL = np.zeros((3,self.Nx-2))
-        self.WIR = np.zeros((3,self.Nx-2))
-
     def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.1,0.0,0.125],  gamma=1.4 ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
-        left-states - List , values of pressure velocity and pressure for the
-        left hand states
-        right-states - List , values of pressure velocity and pressure for the
-        right-hand states
+        left-states - density, velocity , pressure
+        right-states - density , velocity , pressure
         gamma - thermodynamic gamma to use for the evolution of fluid
         """
-
         self.gamma = gamma
-        for i in range(self.Nx):
-            if self.x[i] <= x0:
-                self.W[0,i] = left_states[0] # set density
-                self.W[1,i] = left_states[1] # set velocity
-                self.W[2,i] = left_states[2] # set pressure
-            else:
-                self.W[0,i] = right_states[0] # set density
-                self.W[1,i] = right_states[1] # set velocity
-                self.W[2,i] = right_states[2] # set pressure
-        self.U[0,:] = self.W[0,:] # set initial density
-        self.U[1,:] = self.W[0,:] * self.W[1,:]
-        self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
-                self.W[2,:] / (self.gamma - 1.0)
+        for i in range(3):
+            self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
+        self.U = self.prim_to_cons( self.W )
 
     def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
@@ -140,6 +116,14 @@ class EulerSolver:
                 ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
         return W
 
+    def prim_to_cons( self , W ):
+        U = np.zeros((3,self.Nx))
+        U[0,:] = W[0,:] # set initial density
+        U[1,:] = W[0,:] * W[1,:]
+        U[2,:] = 0.5 * W[0,:] * W[1,:]**2 + \
+                W[2,:] / (self.gamma - 1.0)
+        return U
+
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
@@ -160,13 +144,29 @@ class EulerSolver:
             self.t += dt # increment time
 
     def Euler_Flux( self , W ):
-        """ compute fluxes for each cell using primitives """
+        """ compute fluxes for each cell using primitives
+        rhov , rhov^2+P , (E+P)v
+        """
         flux = np.zeros((3,self.Nx))
         flux[0,:] = self.W[0,:] * self.W[1,:]
         flux[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
         flux[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
             0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
         return flux
+
+    def HLLE_Flux( self , UIL, UIR , FL , FR , am , ap ):
+        # need Nx + 1 fluxes because Nx +1 interfaces
+        # thats why everything on rhs has len 997 ( we have N=1000 )
+        # i added 1 to start and stop of FL and FR because that array actually
+        # has same size as U
+        # when we take FHLL[1:] and FHLL[:-1], that'll yield len 996
+        # which is the Nx - 2 Ng we expected to update all physical cells
+        FHLL = np.zeros((3,self.Nx-3))
+        LU = np.zeros((3,self.Nx))
+        for i in range(3):
+            FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UIR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
+            LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+        return LU
 
     def get_dt(self ):
         # TODO: implement new eigenvalues ( \lambda_{\pm}=(v\pm c_s)/(1\pm v c_s ) )
@@ -195,12 +195,10 @@ class EulerSolver:
             minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
             0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
             theta * (self.U[:,i+2]-self.U[:,i+1]))
-
         return UIL, UIR
 
     def LU(self):
         # using dirichlet boundary conditions by not updating ghost cells
-        # low order in space
         ap = np.empty( self.Nx - 1 )
         am = np.empty( self.Nx - 1 )
         if self.spatial_order == 1:
@@ -215,32 +213,19 @@ class EulerSolver:
             self.F[:,:] = self.Euler_Flux( self.W )
             LU = self.getLU( self.U , ap , am )
         elif self.spatial_order != 1:
-            FHLL = np.zeros((3,self.Nx-3))
             LU = np.zeros((3,self.Nx))
             UIL, UIR = self.Reconstruct_States()
-
             WIL = self.cons_to_prim( UIL )
             WIR = self.cons_to_prim( UIR )
-
             csL = self.get_sound_speed( WIL[0,:], WIL[2,:] )
             csR = self.get_sound_speed( WIR[0,:], WIR[2,:] )
-
             for i in range(1,self.Nx-2):
                 ap[i] = max(0, +(WIL[1,i-1] + csL[i-1]), + (WIR[1,i] + csR[i]) )
                 am[i] = max(0, -(WIL[1,i-1] - csL[i-1]), - (WIR[1,i] - csR[i]) )
-
+            # compute physical fluxes
             FL = self.Euler_Flux( WIL )
             FR = self.Euler_Flux( WIR )
-
-            # need Nx + 1 fluxes because Nx +1 interfaces
-            # thats why everything on rhs has len 997 ( we have N=1000 )
-            # i added 1 to start and stop of FL and FR because that array actually
-            # has same size as U
-            # when we take FHLL[1:] and FHLL[:-1], that'll yield len 996
-            # which is the Nx - 2 Ng we expected to update all physical cells
-            for i in range(3):
-                FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UIR[i,1:] -  UIL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
-                LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+            LU[:,:] = self.HLLE_Flux( UIL, UIR , FL , FR , am , ap )
 
         return LU
 
@@ -272,14 +257,14 @@ class EulerSolver:
 
 if __name__=="__main__":
     # final time
-    t = 0.3
+    t = 0.1
     # initialize euler solver object
     e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=2 )
     # set initial conditions
-    # e.setSod()
+    e.setSod()
     # e.setSmoothWave()
-    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     # save initial configuration
     winit = e.W.copy()
     # evolve to final time
