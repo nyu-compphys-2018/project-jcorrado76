@@ -71,6 +71,14 @@ class EulerSolver:
         self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
                 self.W[2,:] / (self.gamma - 1.0)
 
+    def lambdaP( self  , v , cs ):
+        c=3e8
+        return (v+cs)/(1+v*cs/c**2)
+
+    def lambdaM( self , v , cs ):
+        c=3e8
+        return (v-cs)/(1-v*cs/c**2)
+
     def get_sound_speed(self, r , p):
         # let me know if encountering negative pressures
         if isinstance(p,np.ndarray):
@@ -177,8 +185,8 @@ class EulerSolver:
         self.cs = self.get_sound_speed( self.W[0,:],self.W[2,:])
 
         dt = self.cfl * self.dx / \
-                np.max([ np.max( np.fabs( self.W[1,:] + self.cs ) ) ,\
-                         np.max( np.fabs( self.W[1,:] - self.cs ) )])
+                np.max([ np.max( np.fabs( self.lambdaP(self.W[1,:] , self.cs) ) ) ,\
+                         np.min( np.fabs( self.lambdaM(self.W[1,:] , self.cs) ) )])
         return(dt)
 
     def Reconstruct_States(self, theta=1.5 ):
@@ -209,10 +217,10 @@ class EulerSolver:
         if self.spatial_order == 1:
             cs = self.get_sound_speed(self.W[0,:],self.W[2,:])
             indices = np.arange( self.Nx - 1 )
-            ap = np.maximum( 0 , self.W[1,indices] + cs[indices] )
-            ap = np.maximum( ap , self.W[1,indices+1] + cs[indices+1] )
-            am = np.maximum( 0 , -self.W[1,indices] + cs[indices] )
-            am = np.maximum( am , -self.W[1,indices+1] + cs[indices+1])
+            ap = np.maximum( 0 , self.lambdaP(self.W[1,indices] , cs[indices]) )
+            ap = np.maximum( ap , self.lambdaP(self.W[1,indices+1] , cs[indices+1]) )
+            am = np.maximum( 0 , -self.lambdaM(self.W[1,indices] , cs[indices]) )
+            am = np.maximum( am , -self.lambdaM(self.W[1,indices+1] , cs[indices+1]))
 
             F = self.Euler_Flux( self.W )
             LU[:,:] = self.getLU( self.U , F , ap , am )
@@ -225,8 +233,8 @@ class EulerSolver:
             csL = self.get_sound_speed( WIL[0,:], WIL[2,:] )
             csR = self.get_sound_speed( WIR[0,:], WIR[2,:] )
             for i in range(1,self.Nx-2):
-                ap[i] = max(0, +(WIL[1,i-1] + csL[i-1]), + (WIR[1,i] + csR[i]) )
-                am[i] = max(0, -(WIL[1,i-1] - csL[i-1]), - (WIR[1,i] - csR[i]) )
+                ap[i] = max(0, self.lambdaP(WIL[1,i-1] , csL[i-1]), self.lambdaP(WIR[1,i] , csR[i]) )
+                am[i] = max(0, -self.lambdaM(WIL[1,i-1] , csL[i-1]), -self.lambdaM(WIR[1,i] , csR[i]) )
             # compute physical fluxes
             FL = self.Euler_Flux( WIL )
             FR = self.Euler_Flux( WIR )
@@ -264,7 +272,7 @@ if __name__=="__main__":
     # final time
     t = 0.2
     # initialize euler solver object
-    e = EulerSolver( 400 , 0.0 , 1.0 , 0.5, time_order=2,spatial_order=1 )
+    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
