@@ -147,6 +147,20 @@ class EulerSolver:
         """ relativistic lorentz factor """
         return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:]/c**2)
 
+def get_sound_speed(self, r , p):
+        # let me know if encountering negative pressures
+        if isinstance(p,np.ndarray):
+            if (p < 0.0).any():
+                print("Warning, negative pressure encountered when computing sound speed")
+        else:
+            if p < 0.0:
+                print("Negative pressure encountered when computing sound speed")
+        specific_internal_energy = self.specific_internal_energy( r , p )
+        h = 1. + specific_internal_energy + (p/r)
+        return np.sqrt( ((self.gamma-1.)/h)*(specific_internal_energy + (p / r )) )
+
+
+
     def get_sound_speed(self, r , p):
         # let me know if encountering negative pressures
         if isinstance(p,np.ndarray):
@@ -177,12 +191,15 @@ class EulerSolver:
         """
         self.U += dt * udot
 
+    # TODO: make this function call cons_to_prim
     def update_primitive_variables(self):
+        """ update the member variable W """
         self.W[0,:] = self.U[0,:]
         self.W[1,:] = self.U[1,:] / self.U[0,:]
         self.W[2,:] = ( self.gamma - 1.0 ) *\
                 ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
 
+    # need to perform newton raphson and recover relativistic primitives
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
         W = np.zeros(U.shape)
@@ -192,10 +209,7 @@ class EulerSolver:
                 ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
         return W
 
-    def lorentz( self ):
-        """ relativistic lorentz factor """
-        return(1./np.sqrt(1-self.W[1,:]**2))
-
+    # TODO: make sure relativistic conserved variables are correct D,S,tau
     def prim_to_cons( self , W ):
         """ compute relativistic conserved variables """
         U = np.zeros((3,self.Nx))
@@ -223,6 +237,7 @@ class EulerSolver:
                 self.update_primitive_variables()
             self.t += dt # increment time
 
+    # TODO: make relativistic physical fluxes
     def Euler_Flux( self , W ):
         """ compute fluxes for each cell using primitives
         rhov , rhov^2+P , (E+P)v
@@ -234,6 +249,7 @@ class EulerSolver:
             0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
         return flux
 
+    # TODO: need obvious indices here
     def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
         # need Nx + 1 fluxes because Nx +1 interfaces
         # thats why everything on rhs has len 997 ( we have N=1000 )
@@ -257,6 +273,7 @@ class EulerSolver:
                          np.min( np.fabs( self.lambdaM(self.W[1,:] , self.cs) ) )])
         return(dt)
 
+    #TODO: implement obvious indices
     def Reconstruct_States(self, theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
         # TODO: this is slow because it loops over Nx
