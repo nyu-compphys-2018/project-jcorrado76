@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
 
-c=3e8
-
 def plot_convergence(order='low'):
     """
     this function plots the convergence rate of then
@@ -116,7 +114,6 @@ class EulerSolver:
         self.spatial_order = spatial_order
         # order in time
         self.time_order=time_order
-
     def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.1,0.0,0.125],  gamma=1.4 ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
@@ -128,7 +125,6 @@ class EulerSolver:
         for i in range(3):
             self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
         self.U = self.prim_to_cons( self.W )
-
     def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
@@ -142,7 +138,6 @@ class EulerSolver:
         self.W[0,:] = rho
         self.W[1,:] = v
         self.W[2,:] = p
-
     def setSmoothWave( self ):
         self.W[0,:] = np.sin(2 * np.pi * self.x)+2.0
         self.W[1,:] = 0.0
@@ -153,14 +148,12 @@ class EulerSolver:
                 self.W[2,:] / (self.gamma - 1.0)
 
     def lambdaP( self  , v , cs ):
-        return (v+cs)/(1+v*cs/c**2)
-
+        return (v+cs)/(1+v*cs)
     def lambdaM( self , v , cs ):
-        return (v-cs)/(1-v*cs/c**2)
-
+        return (v-cs)/(1-v*cs)
     def lorentz( self ):
         """ relativistic lorentz factor """
-        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:]/c**2)
+        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:])
 
     def get_sound_speed(self, r , p):
         """ get relativistic sound speed """
