@@ -69,6 +69,21 @@ def plot_convergence(order='low'):
     plt.ylabel("$log(L_1)$")
     plt.legend()
 
+def specific_internal_energy( rho , pressure , gamma=1.4 ):
+    """ assumes ideal gas law """
+    return( pressure / ( rho * ( gamma-1. ) ) )
+
+def specific_enthalpy( rho , pressure , e ):
+    return( 1 + e * (pressure / rho) )
+
+def check_if_negative_pressures( pressures ):
+    if isinstance(pressures,np.ndarray):
+        if (pressures < 0.0).any():
+            print("Warning, negative pressure encountered when computing sound speed")
+    else:
+        if pressures < 0.0:
+            print("Negative pressure encountered when computing sound speed")
+
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
         self.Nx = Nx
@@ -147,29 +162,13 @@ class EulerSolver:
         """ relativistic lorentz factor """
         return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:]/c**2)
 
-def get_sound_speed(self, r , p):
-        # let me know if encountering negative pressures
-        if isinstance(p,np.ndarray):
-            if (p < 0.0).any():
-                print("Warning, negative pressure encountered when computing sound speed")
-        else:
-            if p < 0.0:
-                print("Negative pressure encountered when computing sound speed")
-        specific_internal_energy = self.specific_internal_energy( r , p )
-        h = 1. + specific_internal_energy + (p/r)
-        return np.sqrt( ((self.gamma-1.)/h)*(specific_internal_energy + (p / r )) )
-
-
-
     def get_sound_speed(self, r , p):
-        # let me know if encountering negative pressures
-        if isinstance(p,np.ndarray):
-            if (p < 0.0).any():
-                print("Warning, negative pressure encountered when computing sound speed")
-        else:
-            if p < 0.0:
-                print("Negative pressure encountered when computing sound speed")
-        return np.sqrt( self.gamma * p / r )
+        """ get relativistic sound speed """
+        check_if_negative_pressures( p )
+        e = specific_internal_energy( r , p , gamma=self.gamma )
+        h = specific_enthalpy( r , p , e )
+        return np.sqrt(self.gamma * p / r )
+        # return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
 
     def update_conservative_variables_RK3(self,dt):
         U0 = self.U
