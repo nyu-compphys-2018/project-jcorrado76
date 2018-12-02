@@ -82,6 +82,10 @@ def check_if_negative_pressures( pressures ):
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
 
+def lorentz_factor( self , v ):
+    """ relativistic lorentz factor """
+    return 1./np.sqrt(1. - v*v)
+
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
         self.Nx = Nx
@@ -151,17 +155,14 @@ class EulerSolver:
         return (v+cs)/(1+v*cs)
     def lambdaM( self , v , cs ):
         return (v-cs)/(1-v*cs)
-    def lorentz( self ):
-        """ relativistic lorentz factor """
-        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:])
+
 
     def get_sound_speed(self, r , p):
         """ get relativistic sound speed """
         check_if_negative_pressures( p )
         e = specific_internal_energy( r , p , gamma=self.gamma )
         h = specific_enthalpy( r , p , e )
-        return np.sqrt(self.gamma * p / r )
-        # return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
+        return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
 
     def update_conservative_variables_RK3(self,dt):
         U0 = self.U
@@ -201,15 +202,18 @@ class EulerSolver:
                 ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
         return W
 
-    # TODO: make sure relativistic conserved variables are correct D,S,tau
     def prim_to_cons( self , W ):
         """ compute relativistic conserved variables """
         U = np.zeros((3,self.Nx))
-        specific_internal_energy = W[2,:]/(W[0,:]*(self.gamma-1.))
-        h = 1. + specific_internal_energy + (W[2,:]/W[0,:])
-        U[0,:] = self.lorentz()*W[0,:] # set initial density
-        U[1,:] = W[0,:] * W[1,:] * h * self.lorentz()**2
-        U[2,:] = W[0,:]*h*self.lorentz()**2-W[2,:]-self.lorentz()*W[0,:]
+        r = W[0,:]
+        v = W[1,:]
+        p = W[2,:]
+        e = specific_internal_energy( r , p , self.gamma )
+        h = specific_enthalpy( r , p , e )
+        lorentz = lorentz_factor(v)
+        U[0,:] = lorentz * r  # D
+        U[1,:] = r * v * h * lorentz * lorentz # Sx
+        U[2,:] = r * h * lorentz * lorentz - p - lorentz * r # tau
         return U
 
     def evolve(self, tfinal):
@@ -229,16 +233,21 @@ class EulerSolver:
                 self.update_primitive_variables()
             self.t += dt # increment time
 
-    # TODO: make relativistic physical fluxes
     def Euler_Flux( self , W ):
         """ compute fluxes for each cell using primitives
         rhov , rhov^2+P , (E+P)v
         """
         flux = np.zeros((3,self.Nx))
-        flux[0,:] = self.W[0,:] * self.W[1,:]
-        flux[1,:] = self.W[0,:] * self.W[1,:]**2 + self.W[2,:]
-        flux[2,:] = ( (self.W[2,:] / (self.gamma - 1.0) + \
-            0.5*self.W[0,:]*self.W[1,:]**2) + self.W[2,:]) * self.W[1,:]
+        r = W[0,:]
+        v = W[1,:]
+        p = W[2,:]
+        lorentz = lorentz_factor( v )
+        e = specific_internal_energy( r , p , gamma=self.gamma )
+        h = specific_enthalpy( r , p , e )
+        tau = r * h * lorentz * lorentz - p - lorentz * r
+        flux[0,:] = r * v * lorentz
+        flux[1,:] = r * h * lorentz * lorentz * v * v + p
+        flux[2,:] = v * ( tau + p )
         return flux
 
     # TODO: need obvious indices here
