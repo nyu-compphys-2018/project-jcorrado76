@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
 
+c=3e8
 
 def plot_convergence(order='low'):
     """
@@ -137,12 +138,14 @@ class EulerSolver:
                 self.W[2,:] / (self.gamma - 1.0)
 
     def lambdaP( self  , v , cs ):
-        c=3e8
         return (v+cs)/(1+v*cs/c**2)
 
     def lambdaM( self , v , cs ):
-        c=3e8
         return (v-cs)/(1-v*cs/c**2)
+
+    def lorentz( self ):
+        """ relativistic lorentz factor """
+        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:]/c**2)
 
     def get_sound_speed(self, r , p):
         # let me know if encountering negative pressures
