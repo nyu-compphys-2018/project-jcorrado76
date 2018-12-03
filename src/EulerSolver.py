@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
+from scipy.optimize import newton
 
 def plot_convergence(order='low'):
     """
@@ -85,6 +86,17 @@ def check_if_negative_pressures( pressures ):
 def lorentz_factor( self , v ):
     """ relativistic lorentz factor """
     return 1./np.sqrt(1. - v*v)
+
+def fp( P , D , S , tau , gamma=1.4):
+    vstar = S / ( tau + P + D )
+    wstar = 1. / np.sqrt( 1 - vstar * vstar )
+    rstar = D / wstar
+    estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
+    return (( gamma - 1.) * rstar * estar - p)
+
+def dfp():
+    """ analytic derivative of the above expression """
+
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
@@ -196,10 +208,22 @@ class EulerSolver:
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
         W = np.zeros(U.shape)
-        W[0,:] = U[0,:]
-        W[1,:] = U[1,:] / U[0,:]
-        W[2,:] = ( self.gamma - 1.0 ) *\
-                ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
+        D = U[0,:]
+        S = U[1,:]
+        tau = U[2,:]
+        ps = np.zeros(D.shape[0])
+
+        p0s = np.fabs( S - tau - D )
+        for i in range(p0s.shape[0]):
+            p = newton( func=fp, x0=p0[i] , args=( D[i] , S[i] , tau[i] ) , tol=1e-6 , maxiter=10 )
+            ps[i] = p
+
+        v = S / ( tau + ps + D )
+        lorentz = lorentz_factor( v )
+        W[2,:] = ps[:]
+        W[1,:] = v
+        W[0,:] = D / lorentz
+
         return W
 
     def prim_to_cons( self , W ):
