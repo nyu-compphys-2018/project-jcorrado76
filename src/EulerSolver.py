@@ -142,8 +142,8 @@ class EulerSolver:
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** self.gamma
-        self.cs = self.get_sound_speed(rho ,p)
-        v = (2. / (self.gamma-1.) ) * (self.cs - self.get_sound_speed(rho0,p0))
+        cs = self.get_sound_speed(rho ,p)
+        v = (2. / (self.gamma-1.) ) * (cs - self.get_sound_speed(rho0,p0))
 
         self.U[0,:] = rho
         self.U[1,:] = rho * v
@@ -162,10 +162,12 @@ class EulerSolver:
                 self.W[2,:] / (self.gamma - 1.0)
 
     def lambdaP( self  , v , cs ):
-        return (v+cs)/(1+v*cs)
+        # return (v+cs)/(1+v*cs)
+        return v+cs
 
     def lambdaM( self , v , cs ):
-        return (v-cs)/(1-v*cs)
+        # return (v-cs)/(1-v*cs)
+        return v-cs
 
     def lorentz( self ):
         """ relativistic lorentz factor """
@@ -175,9 +177,6 @@ class EulerSolver:
         """ get relativistic sound speed """
         check_if_negative_pressures( p )
         return np.sqrt(self.gamma * p / r )
-        # e = specific_internal_energy( r , p , gamma=self.gamma )
-        # h = specific_enthalpy( r , p , e )
-        # return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
 
     def update_conservative_variables_RK3(self,dt):
         U0 = self.U
@@ -240,6 +239,9 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
+            if (self.W[2,:]<0).any():
+                print("Negative pressure:")
+                print(self.W[2,:])
             self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:] )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,

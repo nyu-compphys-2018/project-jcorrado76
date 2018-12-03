@@ -7,7 +7,7 @@ from EulerSolver import EulerSolver, plot_convergence
 
 def main():
     order = 'high'
-    tfinal = 0.2
+    tfinal = 0.1
     CFL = 0.1
     N = 200
     if order == 'low':

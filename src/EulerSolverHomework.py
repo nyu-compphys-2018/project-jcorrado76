@@ -35,7 +35,7 @@ class EulerSolver:
         self.U[2][:midway_point] = total_energy( pl , rhol , vl , self.gamma )
 
         self.U[0][midway_point:] = rhor
-        self.U[1][midway_point:] = rhor * vr 
+        self.U[1][midway_point:] = rhor * vr
         self.U[2][midway_point:] = total_energy( pr, rhor , vr , self.gamma )
 
         self.v[:midway_point] = vl
@@ -70,7 +70,7 @@ class EulerSolver:
 
     def update_alphas(self):
         def LP( v , sound_speed ):
-            return v + sound_speed 
+            return v + sound_speed
         def LM( v , sound_speed ):
             return v - sound_speed
         v = self.v
@@ -95,10 +95,10 @@ class EulerSolver:
     def evolve(self, tfinal):
         # pdb.set_trace()
         self.tfinal = tfinal
-        while self.t < tfinal: # while time less than tfinal 
+        while self.t < tfinal: # while time less than tfinal
             self.update_pressure() # sound speed in each region depends on pressure
             self.update_sound_speed() # or else the alphas are zero on first step
-            self.update_alphas() # dt depends on alphas 
+            self.update_alphas() # dt depends on alphas
             dt = self.get_dt()
             if (self.time_order==1):
                 self.forward_euler(dt)
@@ -111,7 +111,7 @@ class EulerSolver:
 
     def get_dt(self ):
         dt = self.cfl * self.dx / max(np.maximum(self.am,self.ap))
-        if self.t+dt > self.tfinal: # if we're about to overshoot, 
+        if self.t+dt > self.tfinal: # if we're about to overshoot,
             dt = self.tfinal - self.t # don't
         return(dt)
 
@@ -153,7 +153,7 @@ class EulerSolver:
                         theta * ( U[:,i+2] - U[:,i+1] ) )
             FHLL = ( self.ap * FL + self.am * FR - self.ap * self.am * (\
                 cr - cl ))  / ( self.ap + self.am )
-            # two ghost cells 
+            # two ghost cells
             LU[:,2:-2] = -( FHLL[:,3:] - FHLL[:,:-3] ) / self.dx
             print("LU:",LU[0])
         else:
@@ -180,3 +180,10 @@ class EulerSolver:
 
     def write_to_file():
         ''' write final solution to file'''
+
+
+if __name__=="__main__":
+    e = EulerSolver(Nx=100 , a=0.0 , b=1.0 ,gamma=1.4,cfl=0.5)
+    e.setInitConditions()
+    e.evolve( 0.1 )
+    e.plot()
