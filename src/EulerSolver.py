@@ -371,15 +371,15 @@ class EulerSolver:
 
 if __name__=="__main__":
     # final time
-    t = 0.01
+    t = 0.1
     # initialize euler solver object
     e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.8, time_order=2 , spatial_order=1,bc='outflow' )
     # set initial conditions
-    e.setSod()
+    # e.setSod()
     # e.setSmoothWave()
-    title="Sod"
-    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    title="Isentropic Wave"
+    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     # save initial configuration
     winit = e.W.copy()
     # evolve to final time
