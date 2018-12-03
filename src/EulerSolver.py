@@ -371,9 +371,9 @@ class EulerSolver:
 
 if __name__=="__main__":
     # final time
-    t = 0.2
+    t = 0.01
     # initialize euler solver object
-    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=1 )
+    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.8, time_order=2 , spatial_order=1,bc='outflow' )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
