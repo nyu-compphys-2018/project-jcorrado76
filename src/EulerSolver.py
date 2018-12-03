@@ -255,6 +255,7 @@ class EulerSolver:
     def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
         FHLL = np.zeros((3,self.Nx+1))
         Flux_Difference = np.zeros((3,self.Nx))
+        # pdb.set_trace()
         for i in range(3):
             FHLL[i,:] = ( ap*FL[i,:] + am*FR[i,:] - ap * am *( UR[i,:] -  UL[i,:] ) ) / (ap + am)
             Flux_Difference[i,:] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx

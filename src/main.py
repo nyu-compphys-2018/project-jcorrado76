@@ -8,7 +8,7 @@ from EulerSolver import EulerSolver, plot_convergence
 def main():
     order = 'low'
     tfinal = 0.2
-    CFL = 0.3
+    CFL = 0.01
     N = 100
     if order == 'low':
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=1 )
