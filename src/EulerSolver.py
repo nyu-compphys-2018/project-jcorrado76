@@ -392,10 +392,10 @@ if __name__=="__main__":
     # plot_convergence(order='high')
 
     # make animation
-    fig = plt.figure()
-    ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
-    line, = ax.plot([], [], lw=2)
-    anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
-                                   frames=200, interval=20, blit=True)
-    anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+    # fig = plt.figure()
+    # ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
+    # line, = ax.plot([], [], lw=2)
+    # anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
+    #                                frames=200, interval=20, blit=True)
+    # anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
     plt.show()
