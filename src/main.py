@@ -15,6 +15,7 @@ def main():
     else:
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=2,spatial_order=2 )
     # set initial conditions
+    # relativistic sod conditions
     left_states = [10.0,0.0,13.3]
     right_states = [1.0,0.0,0.66e-6]
     e.setSod(left_states=left_states,right_states=right_states)
