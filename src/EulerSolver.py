@@ -360,7 +360,7 @@ class EulerSolver:
 
         fig.suptitle( title ,fontsize=16)
         for i, axis in enumerate(axes):
-            axis.plot( self.x , self.W[i,:], label=labels[i])
+            axis.plot( self.x , self.U[i,:], label=labels[i])
             axis.set_title(labels[i])
             axis.grid(True)
             axis.legend()
