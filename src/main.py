@@ -28,10 +28,10 @@ def main():
         axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-    if order == 'low':
-        plot_convergence(order='low')
-    else:
-        plot_convergence(order='high')
+    # if order == 'low':
+    #     plot_convergence(order='low')
+    # else:
+    #     plot_convergence(order='high')
     plt.show()
 
 main()
