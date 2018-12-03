@@ -92,10 +92,8 @@ def initialize_animation():
 def animate(t):
     e = EulerSolver(Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
     e.setSod()
-    ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
-    line, = ax.plot(e.x, e.W[2,:], lw=2)
     e.evolve(t)
-    line.set_data( self.x,self.W[2,:] )
+    line.set_data( e.x,e.W[2,:] )
     return line,
 
 class EulerSolver:
@@ -371,7 +369,7 @@ if __name__=="__main__":
     # final time
     t = 0.2
     # initialize euler solver object
-    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
+    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=1 )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
@@ -395,6 +393,8 @@ if __name__=="__main__":
 
     # make animation
     fig = plt.figure()
+    ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
+    line, = ax.plot([], [], lw=2)
     anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
                                    frames=200, interval=20, blit=True)
     anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
