@@ -4,9 +4,10 @@ from numpy.polynomial.polynomial import polyfit
 from eulerExact import riemann
 
 def minmod( x , y , z ):
-    return( 1./4. * np.fabs( np.sign(x) + np.sign(y)) * \
-            (np.sign(x) + np.sign(z)) * \
-            min(np.minimum(np.minimum(np.fabs(x),np.fabs(y)),np.fabs(z))))
+    prefactor = (1./4.) * np.abs( np.sign( x ) + np.sign ( y ) )
+    minimum = np.minimum( np.abs( x ) , np.abs ( y ) )
+    minimum = np.minimum( minimum , np.abs( z ) )
+    return( prefactor * ( np.sign( x ) + np.sign( z ) ) * minimum )
 
 def compute_l1_error( numerical , exact , deltaX ):
     diff = np.abs( numerical - exact )

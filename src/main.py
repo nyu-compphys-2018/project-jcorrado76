@@ -4,7 +4,6 @@ from eulerExact import riemann
 from utils import *
 from EulerSolver import EulerSolver, plot_convergence
 
-
 def main():
     order = 'high'
     tfinal = 0.1

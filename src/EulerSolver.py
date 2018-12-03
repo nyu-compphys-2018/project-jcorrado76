@@ -106,8 +106,6 @@ class EulerSolver:
         self.grid_size = self.Nx + 2 * self.Ng
         self.k = np.arange( self.Nx + 2 * self.Ng )
         self.dx = (self.b-self.a)/float(self.Nx)
-        # x values of bin centers
-        # self.x = a + self.dx * ( self.k )
 
         # xs[ilo:ihi+1] contains the physical range of xs
         self.x = a + \
@@ -303,14 +301,14 @@ class EulerSolver:
             UIR = np.zeros((3,self.Nx+1))
             for i in range( self.Nx+1 ):
                 UIL[:,i] = U[:,i+1] + 0.5 *\
-                minmod( theta * ( U[:,i+1]-U[:,i]),\
-                0.5 * ( U[:,i+2]-U[:,i] ) ,\
-                theta * (U[:,i+2]-U[:,i+1]))
+                minmod( theta * ( U[:,i+1] - U[:,i]),\
+                0.5 * ( U[:,i+2] - U[:,i] ) ,\
+                theta * (U[:,i+2] - U[:,i+1]))
 
-                UIR[:,i] = U[:,i+1] - 0.5 *\
-                minmod( theta * ( U[:,i+1]-U[:,i]),\
-                0.5 * ( U[:,i+2]-U[:,i] ) ,\
-                theta * (U[:,i+2]-U[:,i+1]))
+                UIR[:,i] = U[:,i+2] - 0.5 *\
+                minmod( theta * ( U[:,i+2]-U[:,i+1]),\
+                0.5 * ( U[:,i+3]-U[:,i+1] ) ,\
+                theta * (U[:,i+3]-U[:,i+2]))
 
             UL = UIL
             UR = UIR
@@ -370,24 +368,22 @@ class EulerSolver:
         return (axes)
 
 if __name__=="__main__":
-    # final time
-    t = 0.1
-    # initialize euler solver object
-    order = 'low'
+    tfinal = 0.1
+    order = 'high'
+    cfl = 0.3
     if order == 'low':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.8, time_order=1 , spatial_order=1 , bc='outflow' )
+        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
     if order == 'high':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.8, time_order=3 , spatial_order=2 , bc='outflow' )
-    # set initial conditions
-    # e.setSod()
+        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
+    e.setSod()
     # e.setSmoothWave()
     title="Isentropic Wave"
-    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     # save initial configuration
     winit = e.W.copy()
     # evolve to final time
-    e.evolve( t )
+    e.evolve( tfinal )
     # plot the euler solver and capture resultant axes
     axes = e.plot(title=title)
     # add the initial configurations on each subplot
