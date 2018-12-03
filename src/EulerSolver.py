@@ -79,12 +79,10 @@ def check_if_negative_pressures( pressures ):
     if isinstance(pressures,np.ndarray):
         if (pressures < 0.0).any():
             print("Warning, negative pressure encountered when computing sound speed")
-            print(pressures)
     else:
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
             print(pressures)
-
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow'):
@@ -205,31 +203,44 @@ class EulerSolver:
         """ update the member variable W """
         self.W[:,:] = self.cons_to_prim( self.U )
 
-    # need to perform newton raphson and recover relativistic primitives
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
         W = np.zeros(U.shape)
-        W[0,:] = U[0,:]
-        W[1,:] = U[1,:] / U[0,:]
-        W[2,:] = ( self.gamma - 1.0 ) *\
-                ( U[2,:] - 0.5 * U[1,:]**2 / U[0,:] )
+        r = U[0,:]
+        rv = U[1,:]
+        E = U[2,:]
+        W[0,:] = r
+        W[1,:] = rv / r
+        W[2,:] = ( self.gamma - 1.0 ) * ( E - 0.5 * rv * rv / r )
         return W
 
-    # TODO: make sure relativistic conserved variables are correct D,S,tau
     def prim_to_cons( self , W ):
-        """ compute relativistic conserved variables """
+        """ compute conserved variables """
         U = np.zeros((3,self.grid_size))
-        # specific_internal_energy = W[2,:]/(W[0,:]*(self.gamma-1.))
-        # h = 1. + specific_internal_energy + (W[2,:]/W[0,:])
-        U[0,:] = W[0,:] # set initial density
-        U[1,:] = W[0,:] * W[1,:]
-        U[2,:] = W[2,:]/(self.gamma-1.) + 0.5 * W[0,:] * W[1,:]**2
+        r = W[0,:]
+        v = W[1,:]
+        p = W[2,:]
+
+        U[0,:] = r
+        U[1,:] = r * v
+        U[2,:] = p / ( self.gamma - 1. ) + 0.5 * r * v * v
         return U
+
+    def fill_BCs( self ):
+        if self.bc == "periodic":
+            self.U[ : , 0 : self.ilo ] = self.U[ : , self.ihi - self.Ng + 1 : \
+                                           self.ihi + 1 ]
+            self.U[ : , self.ihi + 1 : ] = self.U[ : , self.ilo : \
+                                             self.ilo + self.Ng ]
+        if self.bc == "outflow":
+            for i in range(3):
+                self.U[ i , 0 : self.ilo ] = self.U[ i , self.ilo ]
+                self.U[ i , self.ihi + 1 : ] = self.U[ i , self.ihi ]
 
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
-            self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:])
+            self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:] )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
                 dt = tfinal - self.t # don't
@@ -238,36 +249,37 @@ class EulerSolver:
             elif self.time_order != 1:
                 self.update_conservative_variables_RK3( dt )
             self.update_primitive_variables()
+            self.fill_BCs()
             self.t += dt # increment time
 
-    # TODO: make relativistic physical fluxes
     def Physical_Fluxes( self , W ):
         """ compute fluxes for each cell using primitives
         rhov , rhov^2+P , (E+P)v
         """
         flux = np.zeros(W.shape)
-        flux[0,:] = W[0,:] * W[1,:]
-        flux[1,:] = W[0,:] * W[1,:]**2 + W[2,:]
-        flux[2,:] = ( (W[2,:] / (self.gamma - 1.0) + \
-            0.5*W[0,:]*W[1,:]**2) + W[2,:]) * W[1,:]
+        r = W[0,:]
+        v = W[1,:]
+        p = W[2,:]
+        E = (p / (self.gamma - 1.0)) + 0.5 * r * v * v
+
+        flux[0,:] = r * v
+        flux[1,:] = r * v * v + p
+        flux[2,:] = (E + p) * v
         return flux
 
     def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
         FHLL = np.zeros((3,self.Nx+1))
         Flux_Difference = np.zeros((3,self.Nx))
-        # pdb.set_trace()
-        for i in range(3):
-            FHLL[i,:] = ( ap*FL[i,:] + am*FR[i,:] - ap * am *( UR[i,:] -  UL[i,:] ) ) / (ap + am)
-            Flux_Difference[i,:] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+        FHLL[:,:] = ( ap * FL + am * FR - ap * am * ( UR - UL ) ) / ( ap + am )
+        Flux_Difference = -( FHLL[:,1:] - FHLL[:,:-1] ) / self.dx
         return Flux_Difference
 
     def get_dt(self ):
-        dt = self.cfl * self.dx / np.max([ np.max( np.fabs( self.lambdaP(self.W[1,:] , self.cs) ) ) ,\
-                         np.min( np.fabs( self.lambdaM(self.W[1,:] , self.cs) ) )])
+        dt = self.cfl * self.dx / np.max([ np.max( np.fabs( self.lambdaP( self.W[1,:] , self.cs ) ) ) ,\
+                                           np.max( np.fabs( self.lambdaM( self.W[1,:] , self.cs ) ) ) ])
         return(dt)
 
-    #TODO: implement obvious indices
-    def Reconstruct_States(self, U=None , theta=1.5 ):
+    def Reconstruct_States(self, U=None , theta=1.0 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
         # TODO: this is slow because it loops over Nx
         # even though we have 2 ghost cells on either side, the size of
@@ -288,15 +300,15 @@ class EulerSolver:
             UIL = np.zeros((3,self.Nx+1))
             UIR = np.zeros((3,self.Nx+1))
             for i in range( self.Nx+1 ):
-                UIL[:,i] = self.U[:,i+1] + 0.5 *\
-                minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
-                0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
-                theta * (self.U[:,i+2]-self.U[:,i+1]))
+                UIL[:,i] = U[:,i+1] + 0.5 *\
+                minmod( theta * ( U[:,i+1]-U[:,i]),\
+                0.5 * ( U[:,i+2]-U[:,i] ) ,\
+                theta * (U[:,i+2]-U[:,i+1]))
 
-                UIR[:,i] = self.U[:,i+1] - 0.5 *\
-                minmod( theta * ( self.U[:,i+1]-self.U[:,i]),\
-                0.5 * ( self.U[:,i+2]-self.U[:,i] ) ,\
-                theta * (self.U[:,i+2]-self.U[:,i+1]))
+                UIR[:,i] = U[:,i+1] - 0.5 *\
+                minmod( theta * ( U[:,i+1]-U[:,i]),\
+                0.5 * ( U[:,i+2]-U[:,i] ) ,\
+                theta * (U[:,i+2]-U[:,i+1]))
 
             UL = UIL
             UR = UIR
