@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import animation
 from eulerExact import riemann
 from utils import *
 
@@ -83,6 +84,19 @@ def check_if_negative_pressures( pressures ):
     else:
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
+
+def initialize_animation():
+    line.set_data([], [])
+    return line,
+
+def animate(t):
+    e = EulerSolver(Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
+    e.setSod()
+    ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
+    line, = ax.plot(e.x, e.W[2,:], lw=2)
+    e.evolve(t)
+    line.set_data( self.x,self.W[2,:] )
+    return line,
 
 class EulerSolver:
     def __init__(self, Nx=10 , a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1):
@@ -352,6 +366,7 @@ class EulerSolver:
         plt.xlabel('x')
         return (axes)
 
+
 if __name__=="__main__":
     # final time
     t = 0.2
@@ -377,4 +392,10 @@ if __name__=="__main__":
 
     # do convergence plot
     # plot_convergence(order='high')
+
+    # make animation
+    fig = plt.figure()
+    anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
+                                   frames=200, interval=20, blit=True)
+    anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
     plt.show()
