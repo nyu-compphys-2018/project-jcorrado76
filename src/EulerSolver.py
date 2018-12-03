@@ -373,7 +373,7 @@ if __name__=="__main__":
     # final time
     t = 0.2
     # initialize euler solver object
-    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
+    e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=1 )
     # set initial conditions
     e.setSod()
     # e.setSmoothWave()
