@@ -229,14 +229,14 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
-            self.cs = self.get_sound_speed( self.W[0,:],self.W[2,:])
+            self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:])
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
                 dt = tfinal - self.t # don't
             if self.time_order == 1:
                 self.update_conservative_variables_forward_euler( dt )
             elif self.time_order != 1:
-                self.update_conservative_variables_RK3(dt)
+                self.update_conservative_variables_RK3( dt )
             self.update_primitive_variables()
             self.t += dt # increment time
 
@@ -302,7 +302,6 @@ class EulerSolver:
         return UL, UR
 
     def alphaP( self , WL , csL , WR , csR ):
-        indices = np.arange( self.Nx + 1 )
         ap = np.maximum( 0 , self.lambdaP( WL[1,:] , csL ) )
         ap = np.maximum( ap , self.lambdaP( WR[1,:] , csR ) )
         return ap

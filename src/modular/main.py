@@ -37,7 +37,7 @@ def main():
 
     plt.xlabel("$x$")
     # plt.ylabel("$u$")
-    plt.savefig("plots/fv-burger-{}.pdf".format( initial_condition ) )
+    plt.savefig("fv-burger-{}.pdf".format( initial_condition ) )
     plt.suptitle("Solution for {} wave".format(initial_condition))
     plt.show()
 
