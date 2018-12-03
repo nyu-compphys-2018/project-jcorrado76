@@ -137,31 +137,24 @@ class EulerSolver:
         right-states - density , velocity , pressure
         gamma - thermodynamic gamma to use for the evolution of fluid
         """
-        self.gamma = gamma
         for i in range(3):
             self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
-        self.U = self.prim_to_cons( self.W )
+        self.U[:,:] = self.prim_to_cons( self.W )
     def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** self.gamma
         self.cs = self.get_sound_speed(rho ,p)
         v = (2. / (self.gamma-1.) ) * (self.cs - self.get_sound_speed(rho0,p0))
-
-        self.U[0,:] = rho
-        self.U[1,:] = rho * v
-        self.U[2,:] = ( p / (self.gamma-1.))+(rho*v*v/2.)
         self.W[0,:] = rho
         self.W[1,:] = v
         self.W[2,:] = p
+        self.U[:,:] = self.prim_to_cons( self.W )
     def setSmoothWave( self ):
         self.W[0,:] = np.sin(2 * np.pi * self.x)+2.0
         self.W[1,:] = 0.0
         self.W[2,:] = 1.0
-        self.U[0,:] = self.W[0,:] # set initial density
-        self.U[1,:] = self.W[0,:] * self.W[1,:]
-        self.U[2,:] = 0.5 * self.W[0,:] * self.W[1,:]**2 + \
-                self.W[2,:] / (self.gamma - 1.0)
+        self.U[:,:] = self.prim_to_cons( self.W )
 
     def lambdaP( self  , v , cs ):
         return (v+cs)/(1+v*cs)
@@ -198,12 +191,7 @@ class EulerSolver:
     def update_primitive_variables(self):
         """ update the member variable W """
         self.W[:,:] = self.cons_to_prim( self.U )
-        # self.W[0,:] = self.U[0,:]
-        # self.W[1,:] = self.U[1,:] / self.U[0,:]
-        # self.W[2,:] = ( self.gamma - 1.0 ) *\
-        #         ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
 
-    # need to perform newton raphson and recover relativistic primitives
     def cons_to_prim( self , U ):
         """ perform a recovery of the primitive variables """
         W = np.zeros(U.shape)
@@ -211,10 +199,12 @@ class EulerSolver:
         S = U[1,:]
         tau = U[2,:]
         ps = np.zeros(D.shape[0])
-
         p0s = np.fabs( S - tau - D )
         for i in range(p0s.shape[0]):
-            p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] ) , tol=1e-6  )
+            pmin = abs( S[i] - tau[i] - D[i] )
+            p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
+            if p < pmin:
+                p = pmin
             ps[i] = p
 
         v = S / ( tau + ps + D )
