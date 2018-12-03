@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
 from scipy.optimize import newton
+import pdb
 
 def plot_convergence(order='low'):
     """
@@ -199,15 +200,24 @@ class EulerSolver:
         S = U[1,:]
         tau = U[2,:]
         ps = np.zeros(D.shape[0])
-        p0s = np.fabs( S - tau - D )
+        p0s = self.W[2,:]
+        # print(p0s)
         for i in range(p0s.shape[0]):
             pmin = abs( S[i] - tau[i] - D[i] )
-            p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
+            try:
+                p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
+            except:
+                p = pmin
             if p < pmin:
                 p = pmin
             ps[i] = p
 
+        if (p==0).any():
+            print("zero pressure encountered")
         v = S / ( tau + ps + D )
+        if ( v >= 1).any():
+            print( "v greater than c")
+            print(np.where(v>=1 , v , 0 ))
         lorentz = lorentz_factor( v )
         W[2,:] = ps[:]
         W[1,:] = v
@@ -273,6 +283,7 @@ class EulerSolver:
         # which is the Nx - 2 Ng we expected to update all physical cells
         FHLL = np.zeros((3,self.Nx-3))
         LU = np.zeros((3,self.Nx))
+        pdb.set_trace()
         for i in range(3):
             FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
             LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
