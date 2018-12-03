@@ -83,12 +83,12 @@ def check_if_negative_pressures( pressures ):
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
 
-def lorentz_factor( self , v ):
+def lorentz_factor( v ):
     """ relativistic lorentz factor """
     return 1./np.sqrt(1. - v*v)
 
-def fp( P , D , S , tau , gamma=1.4):
-    vstar = S / ( tau + P + D )
+def fp( p , D , S , tau , gamma=1.4):
+    vstar = S / ( tau + p + D )
     wstar = 1. / np.sqrt( 1 - vstar * vstar )
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
@@ -168,7 +168,6 @@ class EulerSolver:
     def lambdaM( self , v , cs ):
         return (v-cs)/(1-v*cs)
 
-
     def get_sound_speed(self, r , p):
         """ get relativistic sound speed """
         check_if_negative_pressures( p )
@@ -196,13 +195,13 @@ class EulerSolver:
         """
         self.U += dt * udot
 
-    # TODO: make this function call cons_to_prim
     def update_primitive_variables(self):
         """ update the member variable W """
-        self.W[0,:] = self.U[0,:]
-        self.W[1,:] = self.U[1,:] / self.U[0,:]
-        self.W[2,:] = ( self.gamma - 1.0 ) *\
-                ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
+        self.W[:,:] = self.cons_to_prim( self.U )
+        # self.W[0,:] = self.U[0,:]
+        # self.W[1,:] = self.U[1,:] / self.U[0,:]
+        # self.W[2,:] = ( self.gamma - 1.0 ) *\
+        #         ( self.U[2,:] - 0.5 * self.U[1,:]**2 / self.U[0,:] )
 
     # need to perform newton raphson and recover relativistic primitives
     def cons_to_prim( self , U ):
@@ -215,7 +214,7 @@ class EulerSolver:
 
         p0s = np.fabs( S - tau - D )
         for i in range(p0s.shape[0]):
-            p = newton( func=fp, x0=p0[i] , args=( D[i] , S[i] , tau[i] ) , tol=1e-6 , maxiter=10 )
+            p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] ) , tol=1e-6  )
             ps[i] = p
 
         v = S / ( tau + ps + D )

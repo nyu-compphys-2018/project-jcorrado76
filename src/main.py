@@ -15,11 +15,13 @@ def main():
     else:
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=2,spatial_order=2 )
     # set initial conditions
-    # e.setSod()
+    left_states = [10.0,0.0,13.3]
+    right_states = [1.0,0.0,0.66e-6]
+    e.setSod(left_states=left_states,right_states=right_states)
     # e.setSmoothWave()
-    title="Isentropic Wave"
-    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    title="Sod Problem"
+    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve( tfinal )
     axes = e.plot(title=title)
