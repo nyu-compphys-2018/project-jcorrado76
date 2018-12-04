@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from scipy.optimize import newton
 
 from utils import *
 import pdb
@@ -10,7 +11,7 @@ def specific_internal_energy( rho , pressure , gamma=1.4 ):
     return( pressure / ( rho * ( gamma-1. ) ) )
 
 def specific_enthalpy( rho , pressure , e ):
-    return( 1 + e * (pressure / rho) )
+    return( 1 + e + (pressure / rho) )
 
 def check_if_negative_pressures( pressures ):
     if isinstance(pressures,np.ndarray):
@@ -42,13 +43,23 @@ def fp( p , D , S , tau , gamma=1.4):
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
     return (( gamma - 1.) * rstar * estar - p)
-
 def dfp():
     """ analytic derivative of the above expression """
 
+def fv( v , D , S , tau , gamma ):
+    return( (gamma * v * ( tau - S * v + D ) - S * ( 1 - v * v ) )**2 - \
+             v * v * ( 1 - v * v ) * D * D * ( gamma - 1 )**2 )
+def dfv( v , D , S , tau , gamma ):
+    return( 2 * ( D**2 * v**3 * ( gamma - 1.)**2 + D**2 * v * ( v**2 -1 ) * ( gamma - 1)**2 \
+            + ( -2*S*v*(gamma-1) + gamma * ( D + tau ) ) * ( S * ( v-1)**2 + v * gamma * ( D - S * v + tau ))))
+
+
+def lorentz_factor( v ):
+    return( 1. / np.sqrt( 1. - v * v ) )
+
 
 class EulerSolver:
-    def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow'):
+    def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
         self.Nx = Nx
         self.a = a
         self.b = b
@@ -85,7 +96,7 @@ class EulerSolver:
 
         # speed of sound
         self.cs = np.zeros(self.grid_size)
-        self.gamma = 1.4
+        self.gamma = gamma
 
     def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.125,0.0,0.1],  gamma=1.4 ):
         """
@@ -94,6 +105,7 @@ class EulerSolver:
         right-states - density , velocity , pressure
         gamma - thermodynamic gamma to use for the evolution of fluid
         """
+        self.gamma = gamma
         for i in range(3):
             self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
         self.U[:,:] = self.prim_to_cons( self.W )
@@ -122,10 +134,6 @@ class EulerSolver:
 
     def lambdaM( self , v , cs ):
         return (v-cs)/(1-v*cs)
-
-    def lorentz( self ):
-        """ relativistic lorentz factor """
-        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:])
 
     def get_sound_speed(self, r , p):
         """ get relativistic sound speed """
@@ -164,43 +172,44 @@ class EulerSolver:
         D = U[0,:]
         S = U[1,:]
         tau = U[2,:]
-        ps = np.zeros(D.shape[0])
-        p0s = self.W[2,:]
+        vs = np.zeros(D.shape[0])
+        v0s = self.W[1,:]
         # print(p0s)
-        for i in range(p0s.shape[0]):
-            pmin = abs( S[i] - tau[i] - D[i] )
+        print(v0s)
+        for i in range(D.shape[0]):
+            # pmin = abs( S[i] - tau[i] - D[i] )
             try:
-                p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
+                vroot = newton(func=fv, x0=v0s[i] , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
             except:
-                p = pmin
-            if p < pmin:
-                p = pmin
-            ps[i] = p
+                vroot = 0.01
+            # try:
+                # p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
+            # except:
+                # p = pmin
+            # if p < pmin:
+                # p = pmin
+            # ps[i] = p
+            if vroot > 1:
+                vroot = 0.99
+            vs[i] = vroot
 
-        if (p==0).any():
-            print("zero pressure encountered")
-        v = S / ( tau + ps + D )
-        if ( v >= 1).any():
+        # if (p==0).any():
+            # print("zero pressure encountered")
+        # v = S / ( tau + ps + D )
+        ps = ( S / vs ) - tau - D
+        if ( vs >= 1).any():
             print( "v greater than c")
-            print(np.where(v>=1 , v , 0 ))
-        lorentz = lorentz_factor( v )
-        W[2,:] = ps[:]
-        W[1,:] = v
+            print(np.where(vs>=1 , vs , 0 ))
+        lorentz = lorentz_factor( vs )
+        W[2,:] = ps
+        W[1,:] = vs
         W[0,:] = D / lorentz
-
-        # r = U[0,:]
-        # rv = U[1,:]
-        # E = U[2,:]
-        # W[0,:] = r
-        # W[1,:] = rv / r
-        # W[2,:] = ( self.gamma - 1.0 ) * ( E - 0.5 * rv * rv / r )
-        # return W
 
         return W
 
     def prim_to_cons( self , W ):
         """ compute relativistic conserved variables """
-        U = np.zeros((3,self.Nx))
+        U = np.zeros((3,self.grid_size))
         r = W[0,:]
         v = W[1,:]
         p = W[2,:]
@@ -211,19 +220,6 @@ class EulerSolver:
         U[1,:] = r * v * h * lorentz * lorentz # Sx
         U[2,:] = r * h * lorentz * lorentz - p - lorentz * r # tau
         return U
-
-
-
-def prim_to_cons( self , W ):
-    """ compute conserved variables """
-    U = np.zeros((3,self.grid_size))
-    r = W[0,:]
-    v = W[1,:]
-    p = W[2,:]
-
-    U[0,:] = r
-    U[1,:] = r * v
-    U[2,:] = p / ( self.gamma - 1. ) + 0.5 * r * v * v
 
     def fill_BCs( self ):
         if self.bc == "periodic":
@@ -254,37 +250,21 @@ def prim_to_cons( self , W ):
             self.fill_BCs()
             self.t += dt # increment time
 
-    def Euler_Flux( self , W ):
+    def Physical_Fluxes( self , W ):
         """ compute fluxes for each cell using primitives
         rhov , rhov^2+P , (E+P)v
         """
-        flux = np.zeros((3,self.Nx))
+        flux = np.zeros((3,self.Nx+1))
         r = W[0,:]
         v = W[1,:]
         p = W[2,:]
         lorentz = lorentz_factor( v )
         e = specific_internal_energy( r , p , gamma=self.gamma )
         h = specific_enthalpy( r , p , e )
-        tau = r * h * lorentz * lorentz - p - lorentz * r
         flux[0,:] = r * v * lorentz
         flux[1,:] = r * h * lorentz * lorentz * v * v + p
-        flux[2,:] = v * ( tau + p )
+        flux[2,:] = r * h * lorentz * lorentz * v - r * v * lorentz
         return flux
-
-    # def Physical_Fluxes( self , W ):
-    #     """ compute fluxes for each cell using primitives
-    #     rhov , rhov^2+P , (E+P)v
-    #     """
-    #     flux = np.zeros(W.shape)
-    #     r = W[0,:]
-    #     v = W[1,:]
-    #     p = W[2,:]
-    #     E = (p / (self.gamma - 1.0)) + 0.5 * r * v * v
-    #
-    #     flux[0,:] = r * v
-    #     flux[1,:] = r * v * v + p
-    #     flux[2,:] = (E + p) * v
-        # return flux
 
     def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
         # need Nx + 1 fluxes because Nx +1 interfaces
@@ -293,21 +273,19 @@ def prim_to_cons( self , W ):
         # has same size as U
         # when we take FHLL[1:] and FHLL[:-1], that'll yield len 996
         # which is the Nx - 2 Ng we expected to update all physical cells
-        FHLL = np.zeros((3,self.Nx-3))
-        LU = np.zeros((3,self.Nx))
-        pdb.set_trace()
-        for i in range(3):
-            FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
-            LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+        # FHLL = np.zeros((3,self.Nx-3))
+        # LU = np.zeros((3,self.Nx))
+        # for i in range(3):
+        #     FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
+        #     LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
+        # return LU
 
-        # FHLL = np.zeros((3,self.Nx+1))
-        # Flux_Difference = np.zeros((3,self.Nx))
-        # FHLL[:,:] = ( ap * FL + am * FR - ap * am * ( UR - UL ) ) / ( ap + am )
-        # Flux_Difference = -( FHLL[:,1:] - FHLL[:,:-1] ) / self.dx
-        # return Flux_Difference
-
-        return LU
-
+        # BETTER_INDICES
+        FHLL = np.zeros((3,self.Nx+1))
+        Flux_Difference = np.zeros((3,self.Nx))
+        FHLL[:,:] = ( ap * FL + am * FR - ap * am * ( UR - UL ) ) / ( ap + am )
+        Flux_Difference = -( FHLL[:,1:] - FHLL[:,:-1] ) / self.dx
+        return Flux_Difference
 
 
 
