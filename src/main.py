@@ -6,7 +6,7 @@ from EulerSolver import EulerSolver
 from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'low'
+    order = 'high'
     tfinal = 0.1
     CFL = 0.3
     N = 400
