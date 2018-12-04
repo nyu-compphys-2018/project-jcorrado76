@@ -63,14 +63,21 @@ def plot_sod_shock_tube_convergence( e , order='low'):
     plt.plot( logns , line(logns , vb , vm ) , linestyle='dashed',color='green' , label='L1 Error Fit on Velocity')
     plt.plot( logns , line(logns , pb , pm ) , linestyle='dashed',color='blue' , label='L1 Error Fit on Pressure')
 
-    plt.title("Convergence Plot for Sod Shock Tube")
+
+    if order=='low':
+        title = "Low Order "
+    else:
+        title = "High Order"
+
+    title+="Convergence Plot for Sod Shock Tube"
+    plt.title(title)
     plt.xlabel("$log(N)$")
     plt.ylabel("$log(L_1)$")
     plt.legend()
 
 
 def main():
-    order = 'low'
+    order = 'high'
     CFL = 0.5
     N = 400
 
