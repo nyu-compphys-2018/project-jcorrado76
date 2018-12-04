@@ -6,9 +6,9 @@ from EulerSolver import EulerSolver
 from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'high'
+    order = 'low'
     tfinal = 0.1
-    CFL = 0.3
+    CFL = 0.01
     N = 400
     if order == 'low':
         title = "Low Order"
@@ -19,7 +19,7 @@ def main():
     # set initial conditions
     # relativistic sod conditions
     left_states = [10.0,0.0,13.3]
-    right_states = [1.0,0.0,0.1e-8]
+    right_states = [1.0,0.0,1e-8]
     # left_states = [10.0,0.0,13.3]
     # right_states = [1.0,0.0,0.66e-8]
     e.setSod(left_states=left_states,right_states=right_states,gamma=5./3.)

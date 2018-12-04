@@ -53,10 +53,8 @@ def dfv( v , D , S , tau , gamma ):
     return( 2 * ( D**2 * v**3 * ( gamma - 1.)**2 + D**2 * v * ( v**2 -1 ) * ( gamma - 1)**2 \
             + ( -2*S*v*(gamma-1) + gamma * ( D + tau ) ) * ( S * ( v**2-1) + v * gamma * ( D - S * v + tau ))))
 
-
 def lorentz_factor( v ):
     return( 1. / np.sqrt( 1. - v * v ) )
-
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -175,24 +173,25 @@ class EulerSolver:
         D = U[0,:]
         S = U[1,:]
         tau = U[2,:]
-        vs = np.zeros(D.shape[0])
-        print(self.W[2,:-1].shape)
-        v0s = S / ( tau + self.W[2,:-1] + D)
-        for i in range(D.shape[0]):
-            vroot = newton(func=fv, x0=v0s[i] , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
-            vs[i] = vroot
+        ps = np.zeros(U.shape[1])
+        p0 = 5
+        for i in range(U.shape[1]):
+            proot = newton(func=fv, x0=p0 , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
+            ps[i] = proot
 
-        ps = ( S / vs ) - tau - D
+        vs = S / ( tau + ps + D )
+        lors = lorentz_factor( vs )
+        rs = D / lors
 
         if (ps<0).any():
             print("Negative pressure")
-            ps = np.where(ps<0,0.0,ps)
+            ps = np.where(ps<0,np.fabs(S-tau-D),ps)
         if ( vs >= 1).any():
             print( "v greater than c")
-        lorentz = lorentz_factor( vs )
-        W[2,:] = ps
-        W[1,:] = vs
-        W[0,:] = D / lorentz
+
+        W[2,:] = ps[:]
+        W[1,:] = vs[:]
+        W[0,:] = rs[:]
 
         return W
 
@@ -226,9 +225,6 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
-            if (self.W[2,:]<0).any():
-                print("Negative pressure:")
-                print(self.W[2,:])
             self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:] )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
@@ -368,7 +364,6 @@ class EulerSolver:
             axis.legend()
         plt.xlabel('x')
         return (axes)
-
 
 if __name__=="__main__":
     tfinal = 0.1
