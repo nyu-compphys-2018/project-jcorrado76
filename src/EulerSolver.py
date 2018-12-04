@@ -42,14 +42,26 @@ def fp( p , D , S , tau , gamma=1.4):
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
     return (( gamma - 1.) * rstar * estar - p)
+# def dfp(p , D , S , tau , gamma=1.4):
+    # """ analytic derivative of the above expression """
+    # v = S / ( tau + p + D )
+    # first = 2 * S**2 * ( gamma - 1. ) * ( tau + p * S**2 / ( S**2 - ( D + p +\
+        # tau ) **2 ) + D * ( 1 - 1./np.sqrt(1-v**2)))/(D+p+tau)**3
+    # second =\
+    # (gamma-1.)*(1-v**2)*(1+(D*v**2)/((D+p+tau)*(1-v**2)**(3./2.))-1./(1.-v**2)+(2*p*v**2)/((D+p+tau)*(v**2-1)**2))
+    # third = -1
+    # return first + second + third
 def dfp(p , D , S , tau , gamma=1.4):
-    """ analytic derivative of the above expression """
-    v = S / ( tau + p + D )
-    first = 2 * S**2 * ( gamma - 1. ) * ( tau + p * S**2 / ( S**2 - ( D + p +\
-        tau ) **2 ) + D * ( 1 - 1./np.sqrt(1-v**2)))/(D+p+tau)**3
-    second =\
-    (gamma-1.)*(1-v**2)*(1+(D*v**2)/((D+p+tau)*(1-v**2)**(3./2.))-1./(1.-v**2)+(2*p*v**2)/((D+p+tau)*(v**2-1)**2))
-    third = -1
+    """ approximate derivative of the above expression """
+    vstar = S / ( tau + p + D )
+    lor = lorentz_factor( vstar )
+    r = D / lor 
+    e = specific_internal_energy( r , p , gamma=gamma )
+    h = specific_enthalpy( r , p , e )
+    cs2 = ((gamma - 1.)/h) * (e + (p / r)) 
+    return(vstar * vstar * cs2 - 1)
+
+    
     return first + second + third
 
 def lorentz_factor( v ):
