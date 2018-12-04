@@ -108,16 +108,10 @@ class EulerSolver:
                 self.W[2,:] / (self.gamma - 1.0)
 
     def lambdaP( self  , v , cs ):
-        # return (v+cs)/(1+v*cs)
         return v+cs
 
     def lambdaM( self , v , cs ):
-        # return (v-cs)/(1-v*cs)
         return v-cs
-
-    def lorentz( self ):
-        """ relativistic lorentz factor """
-        return 1./np.sqrt(1.-self.W[1,:]*self.W[1,:])
 
     def get_sound_speed(self, r , p):
         """ get relativistic sound speed """
@@ -227,7 +221,7 @@ class EulerSolver:
                                            np.max( np.fabs( self.lambdaM( self.W[1,:] , self.cs ) ) ) ])
         return(dt)
 
-    def Reconstruct_States(self, U=None , theta=1.0 ):
+    def Reconstruct_States(self, U=None , theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
         # TODO: this is slow because it loops over Nx
         # even though we have 2 ghost cells on either side, the size of
