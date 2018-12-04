@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
-from EulerSolver import EulerSolver , plot_convergence
+from EulerSolver import EulerSolver
 
 def main():
     order = 'low'
@@ -19,10 +19,7 @@ def main():
     left_states=[1,0,1]
     right_states=[0.125,0.0,0.1]
     e.setSod(left_states=left_states , right_states=right_states)
-    # e.setSmoothWave()
     title+=" Sod"
-    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
     e.evolve( tfinal )
     axes = e.plot(title=title)
@@ -41,8 +38,6 @@ def main():
         # axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-    # plt.clf()
-    # plot_convergence( e , order=order )
     plt.show()
 
 main()

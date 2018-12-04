@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from eulerExact import riemann
+
 from utils import *
 import pdb
 
@@ -20,75 +20,6 @@ def check_if_negative_pressures( pressures ):
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
             print(pressures)
-
-def plot_convergence( e ):
-    """
-    this function plots the convergence rate of then
-    scheme
-    """
-    Ns = [ 32 , 64 , 128 , 256 , 512 ]
-    t = e.tfinal
-    b = e.b
-    a = e.a
-    Nx = e.Nx
-    x0 = ( b - a ) / Nx
-    rhol = 1.0; vl = 0.0; pl = 1.0
-    rhor = 0.1; vr = 0.0; pr = 0.125
-    gamma=e.gamma
-
-    rerr = []
-    verr = []
-    perr = []
-
-    L1 = np.zeros( len(Ns) )
-    for i in range(len(Ns)):
-        deltaX = (b-a)/Ns[i]
-        e = EulerSolver(Nx=Ns[i])
-        e.setSod(left_states=[rhol,vl,pl],right_states=[rhor,vr,pr])
-        winit = e.W.copy()
-        e.evolve(t)
-        xexact , rexact , vexact , pexact = riemann( a , b , x0 , Ns[i] , t ,rhol ,vl , pl , rhor , vr , pr , gamma )
-        plt.plot( xexact , rexact , label='exact')
-        plt.plot( e.x , e.W[0,:], label='numerical')
-        plt.plot( e.x , winit[0,:] , label='initial')
-        plt.legend()
-        plt.title("Sod Shock tube to t={} with N={}".format(t,Ns[i]))
-        plt.show()
-        rerr.append( compute_l1_error( e.W[0,e.physical] , rexact , deltaX ))
-        verr.append( compute_l1_error( e.W[1,e.physical] , vexact , deltaX ))
-        perr.append( compute_l1_error( e.W[2,e.physical] ,   pexact , deltaX ))
-
-    print("L1 Errors on Density",rerr)
-    print("L1 Errors on Velocity",verr)
-    print("L1 Errors on Pressure",perr)
-
-    logns = np.log( Ns )
-    logrs = np.log( rerr )
-    logvs = np.log( verr )
-    logps = np.log( perr )
-
-    rb , rm = fit_line( logns , logrs )
-    vb , vm = fit_line( logns , logvs )
-    pb , pm = fit_line( logns , logps )
-
-    print("Density slope:" , rm)
-    print("Velocity slope:" , vm)
-    print("Pressure slope:" , pm)
-
-    fig = plt.figure()
-
-    plt.plot( logns, logrs , color='red' , marker='o',label="L1 Error on Density")
-    plt.plot( logns, logvs , color='green' , marker='o',label="L1 Error on Velocity")
-    plt.plot( logns, logps , color='blue' , marker='o',label="L1 Error on Pressure")
-
-    plt.plot( logns , line(logns , rb , rm ) , linestyle='dashed', color='red' , label='L1 Error Fit on Density')
-    plt.plot( logns , line(logns , vb , vm ) , linestyle='dashed',color='green' , label='L1 Error Fit on Velocity')
-    plt.plot( logns , line(logns , pb , pm ) , linestyle='dashed',color='blue' , label='L1 Error Fit on Pressure')
-
-    plt.title("Convergence Plot for Sod Shock Tube")
-    plt.xlabel("$log(N)$")
-    plt.ylabel("$log(L_1)$")
-    plt.legend()
 
 def initialize_animation():
     line.set_data([], [])
@@ -141,7 +72,7 @@ class EulerSolver:
         self.cs = np.zeros(self.grid_size)
         self.gamma = 1.4
 
-    def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.1,0.0,0.125],  gamma=1.4 ):
+    def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.125,0.0,0.1],  gamma=1.4 ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
         left-states - density, velocity , pressure
@@ -385,8 +316,6 @@ class EulerSolver:
         return (axes)
 
 
-
-
 if __name__=="__main__":
     tfinal = 0.1
     order = 'high'
@@ -412,8 +341,6 @@ if __name__=="__main__":
         axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-    # do convergence plot
-    # plot_convergence(order='high')
 
     # make animation
     # fig = plt.figure()
