@@ -143,17 +143,20 @@ class EulerSolver:
         return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
 
     def update_conservative_variables_RK3(self,dt):
-        U0 = self.U
-        udot = self.LU()
-        self.U[:,self.physical] = U0[:,self.physical] + dt * udot[:,:]
-        U1 = self.U
-        udot = self.LU()
-        self.U[:,self.physical] = 3./4. * U0[:,self.physical] + 1./4. * U1[:,self.physical] + \
-        1./4. * dt * udot
-        U2 = self.U
-        udot = self.LU()
-        self.U[:,self.physical] = 1./3. * U0[:,self.physical] + 2./3. * U2[:,self.physical] + \
-        2./3. * dt * udot
+        Un = self.U
+        U1 = np.zeros(self.U.shape)
+        U2 = np.zeros(self.U.shape)
+
+        update = dt * self.LU( Un )
+        U1[:,self.physical] = Un[:,self.physical] + update
+        self.fill_BCs(U1)
+        update = dt * self.LU( U1 )
+        U2[:,self.physical] = (1./4.)*( 3. * Un[:,self.physical] + U1[:,self.physical] + update )
+        self.fill_BCs(U2)
+        update = dt * self.LU( U2 )
+        self.U[:,self.physical] = \
+        (1./3.)* (Un[:,self.physical] + 2. * U2[:,self.physical] + 2. * update )
+        self.fill_BCs(self.U)
 
     def update_conservative_variables_forward_euler( self , dt ):
         """
@@ -207,16 +210,18 @@ class EulerSolver:
         U[2,:] = r * h * lorentz * lorentz - p - lorentz * r # tau
         return U
 
-    def fill_BCs( self ):
+    def fill_BCs( self , U=None ):
+        if U is None:
+            U = self.U
         if self.bc == "periodic":
-            self.U[ : , 0 : self.ilo ] = self.U[ : , self.ihi - self.Ng + 1 : \
+            U[ : , 0 : self.ilo ] = U[ : , self.ihi - self.Ng + 1 : \
                                            self.ihi + 1 ]
-            self.U[ : , self.ihi + 1 : ] = self.U[ : , self.ilo : \
+            U[ : , self.ihi + 1 : ] = U[ : , self.ilo : \
                                              self.ilo + self.Ng ]
         if self.bc == "outflow":
             for i in range(3):
-                self.U[ i , 0 : self.ilo ] = self.U[ i , self.ilo ]
-                self.U[ i , self.ihi + 1 : ] = self.U[ i , self.ihi ]
+                U[ i , 0 : self.ilo ] = U[ i , self.ilo ]
+                U[ i , self.ihi + 1 : ] = U[ i , self.ihi ]
 
     def evolve(self, tfinal):
         self.tfinal=tfinal
@@ -278,12 +283,8 @@ class EulerSolver:
                                            np.max( np.fabs( self.lambdaM( self.W[1,:] , self.cs ) ) ) ])
         return(dt)
 
-    def Reconstruct_States(self, U=None , theta=1.0 ):
+    def Reconstruct_States(self, U=None , theta=1.5 ):
         """ do a tvd reconstruction using generalized minmod slope limiter """
-        # TODO: this is slow because it loops over Nx
-        # even though we have 2 ghost cells on either side, the size of
-        # interpolated states is Nx-2 and not -4 because we will need only one of the
-        # ghost cells on either side to reconstruct a flux at every interface
         if U is None:
             U=self.U
         UL = np.zeros((3,self.Nx+1))
@@ -323,8 +324,10 @@ class EulerSolver:
         am = np.maximum( am , -self.lambdaM( WR[1,:] , csR ) )
         return am
 
-    def LU(self):
+    def LU(self , U=None):
         # using dirichlet boundary conditions by not updating ghost cells
+        if U is None:
+            U = self.U
         LU = np.zeros((3,self.Nx))
         ap = np.empty( self.Nx+1 )
         am = np.empty( self.Nx+1 )

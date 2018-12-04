@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
 from EulerSolver import EulerSolver
+from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'low'
-    tfinal = 0.4
+    order = 'high'
+    tfinal = 0.1
     CFL = 0.3
     N = 400
     if order == 'low':
@@ -24,7 +25,7 @@ def main():
     e.setSod(left_states=left_states,right_states=right_states,gamma=5./3.)
     # e.setSod()
     # e.setSmoothWave()
-    title="Sod Problem"
+    title+=" Sod"
     # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
     # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
     winit = e.W.copy()
