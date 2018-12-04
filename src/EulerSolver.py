@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from scipy.optimize import newton
 
 from utils import *
 import pdb
@@ -55,6 +54,15 @@ def dfv( v , D , S , tau , gamma ):
 
 def lorentz_factor( v ):
     return( 1. / np.sqrt( 1. - v * v ) )
+
+def newton( f , df , x0 , *args , tol=1e-12 ):
+    delta = abs( 0.0 - f(x0 , *args) )
+    while delta > tol:
+        x0 = x0 - f( x0 , *args) / df( x0 , *args)
+        delta = abs( 0.0 - f(x0, *args) )
+    root = x0
+    return root
+
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
