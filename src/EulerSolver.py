@@ -121,15 +121,18 @@ class EulerSolver:
     def update_conservative_variables_RK3(self,dt):
         U0 = self.U
         udot = self.LU()
-        self.U[:,self.physical] = U0[:,self.physical] + dt * udot[:,:]
+        self.U[:,self.physical] = U0[:,self.physical] + dt * udot
+        self.fill_BCs()
         U1 = self.U
         udot = self.LU()
         self.U[:,self.physical] = 3./4. * U0[:,self.physical] + 1./4. * U1[:,self.physical] + \
         1./4. * dt * udot
+        self.fill_BCs()
         U2 = self.U
         udot = self.LU()
         self.U[:,self.physical] = 1./3. * U0[:,self.physical] + 2./3. * U2[:,self.physical] + \
         2./3. * dt * udot
+        self.fill_BCs()
 
     def update_conservative_variables_forward_euler( self , dt ):
         """
@@ -266,8 +269,10 @@ class EulerSolver:
         am = np.maximum( am , -self.lambdaM( WR[1,:] , csR ) )
         return am
 
-    def LU(self):
+    def LU(self , U=None):
         # using dirichlet boundary conditions by not updating ghost cells
+        if U is None:
+            U = self.U
         LU = np.zeros((3,self.Nx))
         ap = np.empty( self.Nx+1 )
         am = np.empty( self.Nx+1 )

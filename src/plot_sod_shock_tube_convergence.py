@@ -84,4 +84,6 @@ def main():
     plot_sod_shock_tube_convergence( e , order=order )
     plt.show()
 
-main()
+
+if __name__=="__main__":
+    main()

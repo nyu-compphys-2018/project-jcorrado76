@@ -6,13 +6,13 @@ from EulerSolver import EulerSolver
 from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'low'
+    order = 'high'
     tfinal = 0.1
     CFL = 0.5
     N = 400
     if order == 'low':
         title = "Low Order"
-        e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=2 )
+        e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=1 )
     else:
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
@@ -42,8 +42,6 @@ def main():
         # axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-    # plt.clf()
-    # plot_convergence( e , order=order )
     plt.show()
 
 main()
