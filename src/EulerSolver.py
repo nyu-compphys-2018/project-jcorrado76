@@ -42,8 +42,15 @@ def fp( p , D , S , tau , gamma=1.4):
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
     return (( gamma - 1.) * rstar * estar - p)
-def dfp():
+def dfp(p , D , S , tau , gamma=1.4):
     """ analytic derivative of the above expression """
+    v = S / ( tau + p + D )
+    first = 2 * S**2 * ( gamma - 1. ) * ( tau + p * S**2 / ( S**2 - ( D + p +\
+        tau ) **2 ) + D * ( 1 - 1./np.sqrt(1-v**2)))/(D+p+tau)**3
+    second =\
+    (gamma-1.)*(1-v**2)*(1+(D*v**2)/((D+p+tau)*(1-v**2)**(3./2.))-1./(1.-v**2)+(2*p*v**2)/((D+p+tau)*(v**2-1)**2))
+    third = -1
+    return first + second + third
 
 def fv( v , D , S , tau , gamma ):
     return( (gamma * v * ( tau - S * v + D ) - S * ( 1 - v * v ) )**2 - \
@@ -55,14 +62,13 @@ def dfv( v , D , S , tau , gamma ):
 def lorentz_factor( v ):
     return( 1. / np.sqrt( 1. - v * v ) )
 
-def newton( f , df , x0 , *args , tol=1e-12 ):
-    delta = abs( 0.0 - f(x0 , *args) )
+def newton( func , fprime , x0 , *args, tol=1e-12 ):
+    delta = abs( 0.0 - func(x0 , *args) )
     while delta > tol:
-        x0 = x0 - f( x0 , *args) / df( x0 , *args)
-        delta = abs( 0.0 - f(x0, *args) )
+        x0 = x0 - func( x0 , *args) / fprime( x0 , *args)
+        delta = abs( 0.0 - func(x0, *args) )
     root = x0
     return root
-
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -184,7 +190,7 @@ class EulerSolver:
         ps = np.zeros(U.shape[1])
         p0 = 5
         for i in range(U.shape[1]):
-            proot = newton(func=fv, x0=p0 , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
+            proot = newton( fp, dfp , p0 , D[i] , S[i],tau[i], self.gamma)
             ps[i] = proot
 
         vs = S / ( tau + ps + D )
@@ -262,20 +268,6 @@ class EulerSolver:
         return flux
 
     def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
-        # need Nx + 1 fluxes because Nx +1 interfaces
-        # thats why everything on rhs has len 997 ( we have N=1000 )
-        # i added 1 to start and stop of FL and FR because that array actually
-        # has same size as U
-        # when we take FHLL[1:] and FHLL[:-1], that'll yield len 996
-        # which is the Nx - 2 Ng we expected to update all physical cells
-        # FHLL = np.zeros((3,self.Nx-3))
-        # LU = np.zeros((3,self.Nx))
-        # for i in range(3):
-        #     FHLL[i,:] = ( ap[1:-1]*FL[i,1:-2] + am[1:-1]*FR[i,2:-1] - ap[1:-1]*am[1:-1]*( UR[i,1:] -  UL[i,:-1]) ) / (ap[1:-1] + am[1:-1])
-        #     LU[i,2:-2] = -( FHLL[i,1:]-FHLL[i,:-1])/self.dx
-        # return LU
-
-        # BETTER_INDICES
         FHLL = np.zeros((3,self.Nx+1))
         Flux_Difference = np.zeros((3,self.Nx))
         FHLL[:,:] = ( ap * FL + am * FR - ap * am * ( UR - UL ) ) / ( ap + am )
