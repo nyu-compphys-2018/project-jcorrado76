@@ -74,7 +74,6 @@ def main():
     CFL = 0.5
     N = 400
 
-
     if order == 'low':
         title = "Low Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=1 )
