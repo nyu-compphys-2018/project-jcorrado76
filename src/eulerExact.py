@@ -2,7 +2,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-def riemann(a, b, x0, N, T, rhoL, vL, PL, rhoR, vR, PR, gamma, TOL=1.0e-14, MAX=100):
+def riemann(a, b, x0, N, T, rhoL, vL, PL, rhoR, vR, PR, gamma,
+                TOL=1.0e-14, MAX=100):
     # Returns the solution to the Riemann problem with left state (rhoL,vL,PL),
     # and right state (rhoR,vR,PR) after a time 'T' on a grid of N cells on
     # [a,b]. The initial discontinuity is placed at x0.
