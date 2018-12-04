@@ -6,9 +6,9 @@ from EulerSolver import EulerSolver
 
 def main():
     order = 'low'
-    tfinal = 0.2
-    CFL = 0.01
-    N = 100
+    tfinal = 0.4
+    CFL = 0.3
+    N = 400
     if order == 'low':
         title = "Low Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=1 )

@@ -51,7 +51,7 @@ def fv( v , D , S , tau , gamma ):
              v * v * ( 1 - v * v ) * D * D * ( gamma - 1 )**2 )
 def dfv( v , D , S , tau , gamma ):
     return( 2 * ( D**2 * v**3 * ( gamma - 1.)**2 + D**2 * v * ( v**2 -1 ) * ( gamma - 1)**2 \
-            + ( -2*S*v*(gamma-1) + gamma * ( D + tau ) ) * ( S * ( v-1)**2 + v * gamma * ( D - S * v + tau ))))
+            + ( -2*S*v*(gamma-1) + gamma * ( D + tau ) ) * ( S * ( v**2-1) + v * gamma * ( D - S * v + tau ))))
 
 
 def lorentz_factor( v ):
@@ -173,33 +173,19 @@ class EulerSolver:
         S = U[1,:]
         tau = U[2,:]
         vs = np.zeros(D.shape[0])
-        v0s = self.W[1,:]
-        # print(p0s)
-        print(v0s)
+        print(self.W[2,:-1].shape)
+        v0s = S / ( tau + self.W[2,:-1] + D)
         for i in range(D.shape[0]):
-            # pmin = abs( S[i] - tau[i] - D[i] )
-            try:
-                vroot = newton(func=fv, x0=v0s[i] , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
-            except:
-                vroot = 0.01
-            # try:
-                # p = newton( func=fp, x0=p0s[i] , args=( D[i] , S[i] , tau[i] )  )
-            # except:
-                # p = pmin
-            # if p < pmin:
-                # p = pmin
-            # ps[i] = p
-            if vroot > 1:
-                vroot = 0.99
+            vroot = newton(func=fv, x0=v0s[i] , fprime=dfv , args=( D[i] , S[i] , tau[i], self.gamma )  )
             vs[i] = vroot
 
-        # if (p==0).any():
-            # print("zero pressure encountered")
-        # v = S / ( tau + ps + D )
         ps = ( S / vs ) - tau - D
+
+        if (ps<0).any():
+            print("Negative pressure")
+            ps = np.where(ps<0,0.0,ps)
         if ( vs >= 1).any():
             print( "v greater than c")
-            print(np.where(vs>=1 , vs , 0 ))
         lorentz = lorentz_factor( vs )
         W[2,:] = ps
         W[1,:] = vs
@@ -287,8 +273,6 @@ class EulerSolver:
         Flux_Difference = -( FHLL[:,1:] - FHLL[:,:-1] ) / self.dx
         return Flux_Difference
 
-
-
     def get_dt(self ):
         dt = self.cfl * self.dx / np.max([ np.max( np.fabs( self.lambdaP( self.W[1,:] , self.cs ) ) ) ,\
                                            np.max( np.fabs( self.lambdaM( self.W[1,:] , self.cs ) ) ) ])
@@ -375,7 +359,7 @@ class EulerSolver:
 
         fig.suptitle( title ,fontsize=16)
         for i, axis in enumerate(axes):
-            axis.plot( self.x , self.U[i,:], label=labels[i])
+            axis.plot( self.x , self.W[i,:], label=labels[i])
             axis.set_title(labels[i])
             axis.grid(True)
             axis.legend()
