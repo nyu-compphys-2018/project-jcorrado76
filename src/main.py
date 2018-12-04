@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
-from EulerSolver import EulerSolver, plot_convergence
+from EulerSolver import EulerSolver , plot_convergence
 
 def main():
     order = 'high'
@@ -27,10 +27,8 @@ def main():
         axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-    # if order == 'low':
-    #     plot_convergence(order='low')
-    # else:
-    #     plot_convergence(order='high')
+    plt.clf()
+    plot_convergence( e )
     plt.show()
 
 main()

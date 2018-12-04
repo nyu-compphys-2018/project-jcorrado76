@@ -5,19 +5,36 @@ from eulerExact import riemann
 from utils import *
 import pdb
 
-def plot_convergence(order='low'):
+def specific_internal_energy( rho , pressure , gamma=1.4 ):
+    """ assumes ideal gas law """
+    return( pressure / ( rho * ( gamma-1. ) ) )
+
+def specific_enthalpy( rho , pressure , e ):
+    return( 1 + e * (pressure / rho) )
+
+def check_if_negative_pressures( pressures ):
+    if isinstance(pressures,np.ndarray):
+        if (pressures < 0.0).any():
+            print("Warning, negative pressure encountered when computing sound speed")
+    else:
+        if pressures < 0.0:
+            print("Negative pressure encountered when computing sound speed")
+            print(pressures)
+
+def plot_convergence( e ):
     """
     this function plots the convergence rate of then
     scheme
     """
     Ns = [ 32 , 64 , 128 , 256 , 512 ]
-    t=0.1
-    x0=0.5
-    a=0.0
-    b=1.0
+    t = e.tfinal
+    b = e.b
+    a = e.a
+    Nx = e.Nx
+    x0 = ( b - a ) / Nx
     rhol = 1.0; vl = 0.0; pl = 1.0
     rhor = 0.1; vr = 0.0; pr = 0.125
-    gamma=1.4
+    gamma=e.gamma
 
     rerr = []
     verr = []
@@ -26,16 +43,20 @@ def plot_convergence(order='low'):
     L1 = np.zeros( len(Ns) )
     for i in range(len(Ns)):
         deltaX = (b-a)/Ns[i]
-        if order=='low':
-            e = EulerSolver(Nx = Ns[i],time_order=1,spatial_order=1)
-        else:
-            e = EulerSolver(Nx = Ns[i],time_order=2,spatial_order=2)
-        e.setSod()
+        e = EulerSolver(Nx=Ns[i])
+        e.setSod(left_states=[rhol,vl,pl],right_states=[rhor,vr,pr])
+        winit = e.W.copy()
         e.evolve(t)
         xexact , rexact , vexact , pexact = riemann( a , b , x0 , Ns[i] , t ,rhol ,vl , pl , rhor , vr , pr , gamma )
-        rerr.append( compute_l1_error( e.W[0,:] , rexact , deltaX ))
-        verr.append( compute_l1_error( e.W[1,:] , vexact , deltaX ))
-        perr.append( compute_l1_error( e.W[2,:] ,   pexact , deltaX ))
+        plt.plot( xexact , rexact , label='exact')
+        plt.plot( e.x , e.W[0,:], label='numerical')
+        plt.plot( e.x , winit[0,:] , label='initial')
+        plt.legend()
+        plt.title("Sod Shock tube to t={} with N={}".format(t,Ns[i]))
+        plt.show()
+        rerr.append( compute_l1_error( e.W[0,e.physical] , rexact , deltaX ))
+        verr.append( compute_l1_error( e.W[1,e.physical] , vexact , deltaX ))
+        perr.append( compute_l1_error( e.W[2,e.physical] ,   pexact , deltaX ))
 
     print("L1 Errors on Density",rerr)
     print("L1 Errors on Velocity",verr)
@@ -68,22 +89,6 @@ def plot_convergence(order='low'):
     plt.xlabel("$log(N)$")
     plt.ylabel("$log(L_1)$")
     plt.legend()
-
-def specific_internal_energy( rho , pressure , gamma=1.4 ):
-    """ assumes ideal gas law """
-    return( pressure / ( rho * ( gamma-1. ) ) )
-
-def specific_enthalpy( rho , pressure , e ):
-    return( 1 + e * (pressure / rho) )
-
-def check_if_negative_pressures( pressures ):
-    if isinstance(pressures,np.ndarray):
-        if (pressures < 0.0).any():
-            print("Warning, negative pressure encountered when computing sound speed")
-    else:
-        if pressures < 0.0:
-            print("Negative pressure encountered when computing sound speed")
-            print(pressures)
 
 def initialize_animation():
     line.set_data([], [])
@@ -378,6 +383,8 @@ class EulerSolver:
             axis.legend()
         plt.xlabel('x')
         return (axes)
+
+
 
 
 if __name__=="__main__":
