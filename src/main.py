@@ -6,7 +6,7 @@ from EulerSolver import EulerSolver
 from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'low'
+    order = 'high'
     tfinal = 0.1
     CFL = 0.3
     N = 400
@@ -16,9 +16,12 @@ def main():
     else:
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
-    # set initial conditions
-    left_states=[1,0,1]
-    right_states=[0.125,0.0,0.1]
+    # easy shock tube 
+    # left_states=[1,0,1]
+    # right_states=[0.125,0.0,0.1]
+    # harder shock tube
+    left_states=[10,0,100]
+    right_states=[1.,0.0,1.]
     e.setSod(left_states=left_states , right_states=right_states)
     # e.setSmoothWave()
     title+=" Sod"
