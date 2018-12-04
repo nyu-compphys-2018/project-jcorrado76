@@ -52,13 +52,6 @@ def dfp(p , D , S , tau , gamma=1.4):
     third = -1
     return first + second + third
 
-def fv( v , D , S , tau , gamma ):
-    return( (gamma * v * ( tau - S * v + D ) - S * ( 1 - v * v ) )**2 - \
-             v * v * ( 1 - v * v ) * D * D * ( gamma - 1 )**2 )
-def dfv( v , D , S , tau , gamma ):
-    return( 2 * ( D**2 * v**3 * ( gamma - 1.)**2 + D**2 * v * ( v**2 -1 ) * ( gamma - 1)**2 \
-            + ( -2*S*v*(gamma-1) + gamma * ( D + tau ) ) * ( S * ( v**2-1) + v * gamma * ( D - S * v + tau ))))
-
 def lorentz_factor( v ):
     return( 1. / np.sqrt( 1. - v * v ) )
 
@@ -200,8 +193,10 @@ class EulerSolver:
         if (ps<0).any():
             print("Negative pressure")
             ps = np.where(ps<0,np.fabs(S-tau-D),ps)
+            print(ps)
         if ( vs >= 1).any():
             print( "v greater than c")
+            print(vs[vs>1])
 
         W[2,:] = ps[:]
         W[1,:] = vs[:]
@@ -358,7 +353,7 @@ class EulerSolver:
 
         fig.suptitle( title ,fontsize=16)
         for i, axis in enumerate(axes):
-            axis.plot( self.x , self.W[i,:], label=labels[i])
+            axis.plot( self.x[self.physical] , self.W[i,self.physical], label=labels[i])
             axis.set_title(labels[i])
             axis.grid(True)
             axis.legend()
@@ -390,12 +385,4 @@ if __name__=="__main__":
         axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-
-    # make animation
-    # fig = plt.figure()
-    # ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
-    # line, = ax.plot([], [], lw=2)
-    # anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
-    #                                frames=200, interval=20, blit=True)
-    # anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
     plt.show()
