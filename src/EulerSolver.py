@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-
 from utils import *
 import pdb
 
@@ -20,17 +19,6 @@ def check_if_negative_pressures( pressures ):
         if pressures < 0.0:
             print("Negative pressure encountered when computing sound speed")
             print(pressures)
-
-def initialize_animation():
-    line.set_data([], [])
-    return line,
-
-def animate(t):
-    e = EulerSolver(Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
-    e.setSod()
-    e.evolve(t)
-    line.set_data( e.x,e.W[2,:] )
-    return line,
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow'):
@@ -322,32 +310,24 @@ if __name__=="__main__":
     order = 'high'
     cfl = 0.3
     if order == 'low':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
+        e = eulersolver( nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
     if order == 'high':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
-    e.setSod()
-    # e.setSmoothWave()
-    title="Isentropic Wave"
+        e = eulersolver( nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
+    e.setsod()
+    # e.setsmoothwave()
+    title="isentropic wave"
     # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # e.setisentropicwave(rho0,p0,alpha,f,x0,sigma)
     # save initial configuration
-    winit = e.W.copy()
+    winit = e.w.copy()
     # evolve to final time
     e.evolve( tfinal )
     # plot the euler solver and capture resultant axes
     axes = e.plot(title=title)
     # add the initial configurations on each subplot
-    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
+    init_labels = ['initial density','initial velocity','initial pressure']
     for i, axis in enumerate(axes):
         axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
         axis.legend()
 
-
-    # make animation
-    # fig = plt.figure()
-    # ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))
-    # line, = ax.plot([], [], lw=2)
-    # anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,
-    #                                frames=200, interval=20, blit=True)
-    # anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
     plt.show()
