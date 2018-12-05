@@ -42,15 +42,6 @@ def fp( p , D , S , tau , gamma=1.4):
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
     return (( gamma - 1.) * rstar * estar - p)
-# def dfp(p , D , S , tau , gamma=1.4):
-    # """ analytic derivative of the above expression """
-    # v = S / ( tau + p + D )
-    # first = 2 * S**2 * ( gamma - 1. ) * ( tau + p * S**2 / ( S**2 - ( D + p +\
-        # tau ) **2 ) + D * ( 1 - 1./np.sqrt(1-v**2)))/(D+p+tau)**3
-    # second =\
-    # (gamma-1.)*(1-v**2)*(1+(D*v**2)/((D+p+tau)*(1-v**2)**(3./2.))-1./(1.-v**2)+(2*p*v**2)/((D+p+tau)*(v**2-1)**2))
-    # third = -1
-    # return first + second + third
 def dfp(p , D , S , tau , gamma=1.4):
     """ approximate derivative of the above expression """
     vstar = S / ( tau + p + D )
@@ -115,13 +106,15 @@ class EulerSolver:
         self.cs = np.zeros(self.grid_size)
         self.gamma = gamma
 
-    def setSod( self ,  x0=0.5 , left_states=[1,0,1] , right_states=[0.125,0.0,0.1],  gamma=1.4 ):
+    def setSod( self ,  x0=0.5 , parameters=None ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
         left-states - density, velocity , pressure
         right-states - density , velocity , pressure
         gamma - thermodynamic gamma to use for the evolution of fluid
         """
+        if parameters is None:
+            print("Need to set sod parameters")
         self.gamma = gamma
         for i in range(3):
             self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
@@ -209,6 +202,7 @@ class EulerSolver:
         if ( vs >= 1).any():
             print( "v greater than c")
             print(vs[vs>1])
+            vs = np.where( vs>1 , 1e-6 , vs )
 
         W[2,:] = ps[:]
         W[1,:] = vs[:]

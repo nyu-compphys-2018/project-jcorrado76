@@ -6,27 +6,42 @@ from EulerSolver import EulerSolver
 from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
-    order = 'high'
+    order = 'low'
     # order = 'high'
     tfinal = 0.4
     CFL = 0.4
     N = 500
     if order == 'low':
-        title = "Low Order"
-        e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=1,spatial_order=1 )
+        title = "Low Order in Space High order in Time"
+        e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
+                time_order=3,spatial_order=1)
     else:
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
-    left_states = [10.0,0.0,13.3]
-    right_states = [1.0,0.0,1e-8]
-    e.setSod(left_states=left_states,right_states=right_states,gamma=5./3.)
-    # left_states = [1.0,0.0,1.]
-    # right_states = [0.125,0.0,0.1]
-    # e.setSod()
+
+    relativistic_parameters = {"rho_l":10.0 ,"v_l":0.0 , "p_l":13.33,\
+                               "rho_r":1.0 ,   "v_r":0.0, "p_r":1e-8 ,\
+                               "gamma":5./3. , title:"Relativistic" }
+    nonrelativistic_parameters = {"rho_l":1.0 ,"v_l":0.0 , "p_l":1.0,\
+                               "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
+                               "gamma":1.4 , title:"NonRelativistic" }
+
+    params = relativistic_parameters
+
+    e.setSod( parameters=params )
+    title += " {} Sod".format( params['title'] )
+
+
+
+
+    # SMOOTH WAVE 
     # e.setSmoothWave()
-    title+=" Sod"
     # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
     # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+
+
+
+
     winit = e.W.copy()
     e.evolve( tfinal )
     axes = e.plot(title=title)

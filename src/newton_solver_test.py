@@ -11,9 +11,13 @@ lor = lorentz_factor( v )
 e = specific_internal_energy( r , p , gamma )
 h = specific_enthalpy( r , p , e )
 
-D = r * lor
-S = r * v * h * lor * lor # Sx
-tau = r * h * lor**2 - p - lor * r # tau
+
+eps = 1e-3
+
+
+D = r * lor + eps
+S = r * v * h * lor * lor + eps # Sx
+tau = r * h * lor**2 - p - lor * r  + eps# tau
 
 print("D:",D)
 print("S:",S)
