@@ -33,7 +33,7 @@ def main():
                                "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
                                "gamma":1.4 , "title":"NonRelativistic" }
 
-    params = problem_3_relativistic_parameters
+    params =nonrelativistic_parameters
 
     e.setSod( params=params )
     title += " {} Sod".format( params['title'] )
