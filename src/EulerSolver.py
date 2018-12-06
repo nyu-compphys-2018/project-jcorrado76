@@ -106,18 +106,20 @@ class EulerSolver:
         self.cs = np.zeros(self.grid_size)
         self.gamma = gamma
 
-    def setSod( self ,  x0=0.5 , parameters=None ):
+    def setSod( self ,  x0=0.5 , params=None ):
         """
         x0 - Float , value of x position to be the center of the riemann problem
         left-states - density, velocity , pressure
         right-states - density , velocity , pressure
         gamma - thermodynamic gamma to use for the evolution of fluid
         """
-        if parameters is None:
+        if params is None:
             print("Need to set sod parameters")
-        self.gamma = gamma
-        for i in range(3):
-            self.W[i,:] = np.where( self.x <= x0 , left_states[i] , right_states[i] )
+        self.gamma = params['gamma']
+        self.W[0,:] = np.where( self.x <= x0 , params['rho_l'] , params['rho_r'] )
+        self.W[1,:] = np.where( self.x <= x0 , params['v_l'] , params['v_r'] )
+        self.W[2,:] = np.where( self.x <= x0 , params['p_l'] , params['p_r'] )
+
         self.U[:,:] = self.prim_to_cons( self.W )
     def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
@@ -366,29 +368,29 @@ class EulerSolver:
         plt.xlabel('x')
         return (axes)
 
-if __name__=="__main__":
-    tfinal = 0.1
-    order = 'high'
-    cfl = 0.3
-    if order == 'low':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
-    if order == 'high':
-        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
-    e.setSod()
-    # e.setSmoothWave()
-    title="Isentropic Wave"
-    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
-    # save initial configuration
-    winit = e.W.copy()
-    # evolve to final time
-    e.evolve( tfinal )
-    # plot the euler solver and capture resultant axes
-    axes = e.plot(title=title)
-    # add the initial configurations on each subplot
-    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
-    for i, axis in enumerate(axes):
-        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
-        axis.legend()
+# if __name__=="__main__":
+    # tfinal = 0.1
+    # order = 'high'
+    # cfl = 0.3
+    # if order == 'low':
+        # e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
+    # if order == 'high':
+        # e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
+    # e.setSod()
+    # # e.setSmoothWave()
+    # title="Isentropic Wave"
+    # # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    # # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # # save initial configuration
+    # winit = e.W.copy()
+    # # evolve to final time
+    # e.evolve( tfinal )
+    # # plot the euler solver and capture resultant axes
+    # axes = e.plot(title=title)
+    # # add the initial configurations on each subplot
+    # init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
+    # for i, axis in enumerate(axes):
+        # axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
+        # axis.legend()
 
-    plt.show()
+    # plt.show()
