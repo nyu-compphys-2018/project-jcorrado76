@@ -6,7 +6,7 @@ double compute_rhov( float rho , float v ){
     return rho * v ;
 }
 double compute_E( float rho , float v , float p , float gamma ){
-    return( p / ( gamma - 1. ) + 0.5 * rho * v * v;
+    return( p / ( gamma - 1. ) + 0.5 * rho * v * v );
 }
 
 

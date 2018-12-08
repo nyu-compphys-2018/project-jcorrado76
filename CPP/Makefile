@@ -19,3 +19,10 @@ main.exe: $(OBJ_FILES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ -c -o $@ $<
+
+plots: plots/sod_shock_tube.jpg
+	python plot_final_state.py
+
+clean: 
+	rm $(OBJ_DIR)/*.o 
+	rm main.exe

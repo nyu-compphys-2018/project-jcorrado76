@@ -4,8 +4,8 @@
 float EulerSolver::get_dt(){
     float maxP;
     float maxM;
-    float lambdaPlus[grid_size];
-    float lambdaMinus[grid_size];
+    std::vector<float> lambdaPlus(grid_size);
+    std::vector<float> lambdaMinus(grid_size);
 
     for ( int  i = 0 ; i < grid_size ; i++ ) {
         lambdaPlus[i] = lambdaP( v[i] , cs[i] );

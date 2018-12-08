@@ -1,10 +1,8 @@
 #include <cmath>
 #include "EulerSolver.h"
 
-float* EulerSolver::get_sound_speed( float* rho , float* p ){
-    float cslocal[grid_size];
+void EulerSolver::get_sound_speed( const std::vector<float> rho , const std::vector<float> p , std::vector<float> &csLocal ){
     for ( int i = 0 ; i < grid_size ; i++ ){
-        cslocal[i] = sqrt( gamma * p[i] / rho[i] );
+        cslocal[i] (sqrt( gamma * p[i] / rho[i] ));
     }
-    return cslocal;
 }
