@@ -14,7 +14,7 @@ void EulerSolver::evolve( float tend ){
         }else{
             RK3_Update( dt );
         }
-        cons_to_prim( rho , rhov , energy );
+        cons_to_prim( &rho , &rhov , &energy , &v , &p );
         fill_BCs();
         t += dt;
     }
