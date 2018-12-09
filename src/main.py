@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from eulerExact import riemann
 from utils import *
 from EulerSolver import EulerSolver
-from plot_sod_shock_tube_convergence import plot_sod_shock_tube_convergence
 
 def main():
     order = 'low'
@@ -33,7 +32,7 @@ def main():
                                "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
                                "gamma":1.4 , "title":"NonRelativistic" }
 
-    params =nonrelativistic_parameters
+    params = nonrelativistic_parameters
 
     e.setSod( params=params )
     title += " {} Sod".format( params['title'] )
