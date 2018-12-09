@@ -13,7 +13,7 @@ def main():
     if order == 'low':
         title = "Low Order in Space Low order in Time"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
-                time_order=1,spatial_order=1)
+                time_order=3,spatial_order=1)
     else:
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
@@ -32,7 +32,8 @@ def main():
                                "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
                                "gamma":1.4 , "title":"NonRelativistic" }
 
-    params = nonrelativistic_parameters
+    # params = nonrelativistic_parameters
+    params = problem_2_relativistic_parameters
 
     e.setSod( params=params )
     title += " {} Sod".format( params['title'] )

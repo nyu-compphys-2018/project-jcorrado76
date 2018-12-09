@@ -1,70 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import animation
-
 from utils import *
-import pdb
-
-def specific_internal_energy( rho , pressure , gamma=1.4 ):
-    """ assumes ideal gas law """
-    return( pressure / ( rho * ( gamma-1. ) ) )
-
-def specific_enthalpy( rho , pressure , e ):
-    return( 1 + e + (pressure / rho) )
-
-def check_if_negative_pressures( pressures ):
-    if isinstance(pressures,np.ndarray):
-        if (pressures < 0.0).any():
-            print("Warning, negative pressure encountered when computing sound speed")
-    else:
-        if pressures < 0.0:
-            print("Negative pressure encountered when computing sound speed")
-            print(pressures)
-
-def initialize_animation():
-    line.set_data([], [])
-    return line,
-
-def animate(t):
-    e = EulerSolver(Nx=400 , a=0.0 , b=1.0 , cfl=0.3, time_order=2,spatial_order=2 )
-    e.setSod()
-    e.evolve(t)
-    line.set_data( e.x,e.W[2,:] )
-    return line,
-
-def lorentz_factor( v ):
-    """ relativistic lorentz factor """
-    return 1./np.sqrt(1. - v*v)
-
-def fp( p , D , S , tau , gamma=1.4):
-    vstar = S / ( tau + p + D )
-    wstar = 1. / np.sqrt( 1 - vstar * vstar )
-    rstar = D / wstar
-    estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
-    return (( gamma - 1.) * rstar * estar - p)
-def dfp(p , D , S , tau , gamma=1.4):
-    """ approximate derivative of the above expression """
-    vstar = S / ( tau + p + D )
-    lor = lorentz_factor( vstar )
-    r = D / lor 
-    e = specific_internal_energy( r , p , gamma=gamma )
-    h = specific_enthalpy( r , p , e )
-    cs2 = ((gamma - 1.)/h) * (e + (p / r)) 
-    return(vstar * vstar * cs2 - 1)
-
-    
-    return first + second + third
-
-def lorentz_factor( v ):
-    return( 1. / np.sqrt( 1. - v * v ) )
-
-def newton( func , fprime , x0 , *args, tol=1e-12 ):
-    delta = abs( 0.0 - func(x0 , *args) )
-    while delta > tol:
-        x0 = x0 - func( x0 , *args) / fprime( x0 , *args)
-        delta = abs( 0.0 - func(x0, *args) )
-    root = x0
-    return root
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -140,19 +76,6 @@ class EulerSolver:
         self.W[1,:] = 0.0
         self.W[2,:] = 1.0
         self.U[:,:] = self.prim_to_cons( self.W )
-
-    def lambdaP( self  , v , cs ):
-        return (v+cs)/(1+v*cs)
-
-    def lambdaM( self , v , cs ):
-        return (v-cs)/(1-v*cs)
-
-    def get_sound_speed(self, r , p):
-        """ get relativistic sound speed """
-        check_if_negative_pressures( p )
-        e = specific_internal_energy( r , p , gamma=self.gamma )
-        h = specific_enthalpy( r , p , e )
-        return np.sqrt( ((self.gamma - 1.)/h) * (e + (p / r)) )
 
     def update_conservative_variables_RK3(self,dt):
         Un = self.U
@@ -312,16 +235,6 @@ class EulerSolver:
             UL = UIL
             UR = UIR
         return UL, UR
-
-    def alphaP( self , WL , csL , WR , csR ):
-        ap = np.maximum( 0 , self.lambdaP( WL[1,:] , csL ) )
-        ap = np.maximum( ap , self.lambdaP( WR[1,:] , csR ) )
-        return ap
-
-    def alphaM( self , WL , csL , WR , csR ):
-        am = np.maximum( 0 , -self.lambdaM( WL[1,:] , csL ) )
-        am = np.maximum( am , -self.lambdaM( WR[1,:] , csR ) )
-        return am
 
     def LU(self , U=None):
         # using dirichlet boundary conditions by not updating ghost cells
