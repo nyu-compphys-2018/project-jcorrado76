@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import sys
+# need both of these because if you call from makefile or from local tests
+# directory, need to make sure can see eulersolver
+sys.path.insert(0,'../../src')
 sys.path.insert(0,'../src')
 from EulerSolver import EulerSolver
 from utils import f
@@ -11,8 +14,15 @@ tfinal = 0.4
 CFL = 0.4
 N = 500
 
-def run_sod_test( parameters=None , order='low' ):
-    sod_plots_dir = plots_dir + "sod_shock_tube_plots/"
+def run_sod_test( parameters=None ):
+    if sys.argv[1] is not None:
+        order = sys.argv[1]
+    else:
+        order = 'low'
+    if order == 'low':
+        sod_plots_dir = plots_dir + "low_order_sod_shock_tube_plots/"
+    else:
+        sod_plots_dir = plots_dir + "high_order_sod_shock_tube_plots/"
     if parameters is None:
         sys.exit()
     if order == 'low':
@@ -20,7 +30,7 @@ def run_sod_test( parameters=None , order='low' ):
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
                 time_order=1,spatial_order=1)
     else:
-        title = "High Order"
+        title = "Third Order in Time Second Order in Space"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
 
     e.setSod( params = parameters )
