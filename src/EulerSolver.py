@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import animation
 from utils import *
 import pdb
 
@@ -113,14 +112,14 @@ class EulerSolver:
 
         update = dt * self.LU( Un )
         U1[:,self.physical] = Un[:,self.physical] + update
-        self.fill_BCs(U1)
+        # self.fill_BCs(U1)
         update = dt * self.LU( U1 )
         U2[:,self.physical] = (1./4.)*( 3. * Un[:,self.physical] + U1[:,self.physical] + update )
-        self.fill_BCs(U2)
+        # self.fill_BCs(U2)
         update = dt * self.LU( U2 )
         self.U[:,self.physical] = \
         (1./3.)* (Un[:,self.physical] + 2. * U2[:,self.physical] + 2. * update )
-        self.fill_BCs(self.U)
+        # self.fill_BCs(self.U)
 
     def update_conservative_variables_forward_euler( self , dt ):
         """
