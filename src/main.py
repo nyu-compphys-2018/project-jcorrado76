@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
 from EulerSolver import EulerSolver
-from sod_shock_tube_parameters import *
+import sys
+sys.path.insert(0,'../tests')
+from parameters import *
 
 def main():
     order = 'low'
