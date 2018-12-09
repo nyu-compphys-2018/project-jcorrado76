@@ -6,7 +6,8 @@ from eigenvalues import lambdaP, lambdaM
 from alphas import alphaM , alphaP
 from sound_speed import get_sound_speed
 from Reconstruct_States import State_Reconstructor
-from newton import newton, fp , dfp 
+from cons_to_prim import cons_to_prim
+from prim_to_cons import prim_to_cons
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -64,7 +65,7 @@ class EulerSolver:
         self.W[1,:] = np.where( self.x <= x0 , params['v_l'] , params['v_r'] )
         self.W[2,:] = np.where( self.x <= x0 , params['p_l'] , params['p_r'] )
 
-        self.U[:,:] = self.prim_to_cons( self.W )
+        self.U[:,:] = prim_to_cons( self.W , self.gamma )
     def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
@@ -78,12 +79,12 @@ class EulerSolver:
         self.W[0,:] = rho
         self.W[1,:] = v
         self.W[2,:] = p
-        self.U[:,:] = self.prim_to_cons( self.W )
+        self.U[:,:] = prim_to_cons( self.W , self.gamma )
     def setSmoothWave( self ):
         self.W[0,:] = np.sin(2 * np.pi * self.x)+2.0
         self.W[1,:] = 0.0
         self.W[2,:] = 1.0
-        self.U[:,:] = self.prim_to_cons( self.W )
+        self.U[:,:] = prim_to_cons( self.W , self.gamma )
 
     def update_conservative_variables_RK3(self,dt):
         Un = self.U
@@ -110,52 +111,7 @@ class EulerSolver:
 
     def update_primitive_variables(self):
         """ update the member variable W """
-        self.W[:,:] = self.cons_to_prim( self.U )
-
-    def cons_to_prim( self , U ):
-        """ perform a recovery of the primitive variables """
-        W = np.zeros(U.shape)
-        D = U[0,:]
-        S = U[1,:]
-        tau = U[2,:]
-        ps = np.zeros(U.shape[1])
-        p0 = 5
-        for i in range(U.shape[1]):
-            proot = newton( fp, dfp , p0 , D[i] , S[i],tau[i], self.gamma)
-            ps[i] = proot
-
-        vs = S / ( tau + ps + D )
-        lors = lorentz_factor( vs )
-        rs = D / lors
-
-        if (ps<0).any():
-            print("Negative pressure")
-            ps = np.where(ps<0,np.fabs(S-tau-D),ps)
-            print(ps)
-        if ( vs >= 1).any():
-            print( "v greater than c")
-            print(vs[vs>1])
-            vs = np.where( vs>1 , 1e-6 , vs )
-
-        W[2,:] = ps[:]
-        W[1,:] = vs[:]
-        W[0,:] = rs[:]
-
-        return W
-
-    def prim_to_cons( self , W ):
-        """ compute relativistic conserved variables """
-        U = np.zeros((3,self.grid_size))
-        r = W[0,:]
-        v = W[1,:]
-        p = W[2,:]
-        e = specific_internal_energy( r , p , self.gamma )
-        h = specific_enthalpy( r , p , e )
-        lorentz = lorentz_factor(v)
-        U[0,:] = lorentz * r  # D
-        U[1,:] = r * v * h * lorentz * lorentz # Sx
-        U[2,:] = r * h * lorentz * lorentz - p - lorentz * r # tau
-        return U
+        self.W[:,:] = cons_to_prim( self.U, self.gamma )
 
     def fill_BCs( self , U=None ):
         if U is None:
@@ -216,8 +172,8 @@ class EulerSolver:
 
         UL , UR = self.state_reconstructor.Reconstruct_States( U=self.U, theta=1.5 )
 
-        WL = self.cons_to_prim( UL )
-        WR = self.cons_to_prim( UR )
+        WL = cons_to_prim( UL , self.gamma)
+        WR = cons_to_prim( UR, self.gamma )
         csL = get_sound_speed( WL[0,:] , WL[2,:] ,self.gamma)
         csR = get_sound_speed( WR[0,:] , WR[2,:] ,self.gamma)
 
