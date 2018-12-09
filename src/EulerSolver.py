@@ -1,6 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
+from numerical_flux import HLLE_Flux
+from eigenvalues import lambdaP, lambdaM
+from alphas import alphaM , alphaP
+from sound_speed import get_sound_speed
+from Reconstruct_States import State_Reconstructor
+from newton import newton, fp , dfp 
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -17,6 +23,8 @@ class EulerSolver:
             self.Ng = 1
         else:
             self.Ng = 2
+
+        self.state_reconstructor = State_Reconstructor(self.time_order , self.spatial_order)
 
         self.ilo = self.Ng
         self.ihi = self.Ng + self.Nx - 1
@@ -61,8 +69,8 @@ class EulerSolver:
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** self.gamma
-        cs = self.get_sound_speed(rho ,p)
-        v = (2. / (self.gamma-1.) ) * (cs - self.get_sound_speed(rho0,p0))
+        cs = get_sound_speed(rho ,p,self.gamma)
+        v = (2. / (self.gamma-1.) ) * (cs - get_sound_speed(rho0,p0),self.gamma)
 
         self.U[0,:] = rho
         self.U[1,:] = rho * v
@@ -165,7 +173,7 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
-            self.cs = self.get_sound_speed( self.W[0,:] , self.W[2,:] )
+            self.cs = get_sound_speed( self.W[0,:] , self.W[2,:], self.gamma )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
                 dt = tfinal - self.t # don't
@@ -193,48 +201,10 @@ class EulerSolver:
         flux[2,:] = r * h * lorentz * lorentz * v - r * v * lorentz
         return flux
 
-    def HLLE_Flux( self , UL, UR , FL , FR , am , ap ):
-        FHLL = np.zeros((3,self.Nx+1))
-        Flux_Difference = np.zeros((3,self.Nx))
-        FHLL[:,:] = ( ap * FL + am * FR - ap * am * ( UR - UL ) ) / ( ap + am )
-        Flux_Difference = -( FHLL[:,1:] - FHLL[:,:-1] ) / self.dx
-        return Flux_Difference
-
     def get_dt(self ):
-        dt = self.cfl * self.dx / np.max([ np.max( np.fabs( self.lambdaP( self.W[1,:] , self.cs ) ) ) ,\
-                                           np.max( np.fabs( self.lambdaM( self.W[1,:] , self.cs ) ) ) ])
+        dt = self.cfl * self.dx / np.max([ np.max( np.fabs( lambdaP( self.W[1,:] , self.cs ) ) ) ,\
+                                           np.max( np.fabs( lambdaM( self.W[1,:] , self.cs ) ) ) ])
         return(dt)
-
-    def Reconstruct_States(self, U=None , theta=1.5 ):
-        """ do a tvd reconstruction using generalized minmod slope limiter """
-        if U is None:
-            U=self.U
-        UL = np.zeros((3,self.Nx+1))
-        UR = np.zeros((3,self.Nx+1))
-
-        if self.spatial_order==1:
-            # Godunov piecewise constant
-            UL = U[:,self.ilo-1:self.ihi+1]
-            UR = U[:,self.ilo:self.ihi+2]
-
-        elif self.spatial_order!=1:
-            # piecewise linear with minmod slope limiter
-            UIL = np.zeros((3,self.Nx+1))
-            UIR = np.zeros((3,self.Nx+1))
-            for i in range( self.Nx+1 ):
-                UIL[:,i] = U[:,i+1] + 0.5 *\
-                minmod( theta * ( U[:,i+1] - U[:,i]),\
-                0.5 * ( U[:,i+2] - U[:,i] ) ,\
-                theta * (U[:,i+2] - U[:,i+1]))
-
-                UIR[:,i] = U[:,i+2] - 0.5 *\
-                minmod( theta * ( U[:,i+2]-U[:,i+1]),\
-                0.5 * ( U[:,i+3]-U[:,i+1] ) ,\
-                theta * (U[:,i+3]-U[:,i+2]))
-
-            UL = UIL
-            UR = UIR
-        return UL, UR
 
     def LU(self , U=None):
         # using dirichlet boundary conditions by not updating ghost cells
@@ -244,15 +214,15 @@ class EulerSolver:
         ap = np.empty( self.Nx+1 )
         am = np.empty( self.Nx+1 )
 
-        UL , UR = self.Reconstruct_States( self.U )
+        UL , UR = self.state_reconstructor.Reconstruct_States( U=self.U, theta=1.5 )
 
         WL = self.cons_to_prim( UL )
         WR = self.cons_to_prim( UR )
-        csL = self.get_sound_speed( WL[0,:] , WL[2,:] )
-        csR = self.get_sound_speed( WR[0,:] , WR[2,:] )
+        csL = get_sound_speed( WL[0,:] , WL[2,:] ,self.gamma)
+        csR = get_sound_speed( WR[0,:] , WR[2,:] ,self.gamma)
 
-        ap = self.alphaP( WL , csL , WR , csR )
-        am = self.alphaM( WL , csL , WR , csR )
+        ap = alphaP( WL , csL , WR , csR )
+        am = alphaM( WL , csL , WR , csR )
 
         FL = self.Physical_Fluxes( WL )
         FR = self.Physical_Fluxes( WR )
@@ -261,7 +231,7 @@ class EulerSolver:
         # np.where(np.logical_and(self.x[self.ilo-1:self.ihi+1]/self.t<ap,self.x[self.ilo-1:self.ihi+1]/self.t>am),\
         # self.HLLE_Flux( UL , UR , FL , FR , am , ap ),FR))
 
-        LU = self.HLLE_Flux( UL , UR , FL , FR , am , ap )
+        LU = HLLE_Flux( UL , UR , FL , FR , am , ap ) / self.dx
 
         return LU
 
@@ -281,29 +251,29 @@ class EulerSolver:
         plt.xlabel('x')
         return (axes)
 
-# if __name__=="__main__":
-    # tfinal = 0.1
-    # order = 'high'
-    # cfl = 0.3
-    # if order == 'low':
-        # e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
-    # if order == 'high':
-        # e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
-    # e.setSod()
-    # # e.setSmoothWave()
-    # title="Isentropic Wave"
-    # # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
-    # # save initial configuration
-    # winit = e.W.copy()
-    # # evolve to final time
-    # e.evolve( tfinal )
-    # # plot the euler solver and capture resultant axes
-    # axes = e.plot(title=title)
-    # # add the initial configurations on each subplot
-    # init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
-    # for i, axis in enumerate(axes):
-        # axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
-        # axis.legend()
+if __name__=="__main__":
+    tfinal = 0.1
+    order = 'high'
+    cfl = 0.3
+    if order == 'low':
+        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
+    if order == 'high':
+        e = EulerSolver( Nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
+    e.setSod()
+    # e.setSmoothWave()
+    title="Isentropic Wave"
+    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
+    # e.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    # save initial configuration
+    winit = e.W.copy()
+    # evolve to final time
+    e.evolve( tfinal )
+    # plot the euler solver and capture resultant axes
+    axes = e.plot(title=title)
+    # add the initial configurations on each subplot
+    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']
+    for i, axis in enumerate(axes):
+        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
+        axis.legend()
 
-    # plt.show()
+    plt.show()

@@ -1,4 +1,7 @@
-from utils import specific_enthalpy, specific_internal_energy
+from utils import specific_enthalpy, specific_internal_energy,\
+check_if_negative_pressures
+import numpy as np
+
 def get_sound_speed(r , p, gamma ):
     """ get relativistic sound speed """
     check_if_negative_pressures( p )

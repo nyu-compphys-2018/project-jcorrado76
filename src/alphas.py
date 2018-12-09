@@ -1,9 +1,11 @@
+from numpy import maximum
+from eigenvalues import lambdaP,lambdaM
 def alphaP( WL , csL , WR , csR ):
-    ap = np.maximum( 0 , self.lambdaP( WL[1,:] , csL ) )
-    ap = np.maximum( ap , self.lambdaP( WR[1,:] , csR ) )
+    ap = maximum( 0 , lambdaP( WL[1,:] , csL ) )
+    ap = maximum( ap , lambdaP( WR[1,:] , csR ) )
     return ap
 
 def alphaM( WL , csL , WR , csR ):
-    am = np.maximum( 0 , -self.lambdaM( WL[1,:] , csL ) )
-    am = np.maximum( am , -self.lambdaM( WR[1,:] , csR ) )
+    am = maximum( 0 , -lambdaM( WL[1,:] , csL ) )
+    am = maximum( am , -lambdaM( WR[1,:] , csR ) )
     return am
