@@ -3,7 +3,14 @@ check_if_negative_pressures
 import numpy as np
 
 def get_sound_speed(r , p, gamma ):
-    """ get relativistic sound speed """
+    """ 
+    Inputs:
+    r - (nparray) mass density 
+    p - (nparray) pressure 
+    gamma - (float) adiabatic constant 
+    Returns:
+    cs - (nparray) relativistic speed of sound
+    """
     check_if_negative_pressures( p )
     e = specific_internal_energy( r , p , gamma=gamma )
     h = specific_enthalpy( r , p , e )
