@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
 from EulerSolver import EulerSolver
+from sod_shock_tube_parameters import *
 
 def main():
     order = 'low'
@@ -17,28 +18,11 @@ def main():
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
 
-    # SOD SHOCK TUBE PARAMETERS
-    problem_1_relativistic_parameters = {"rho_l":10.0 ,"v_l":0.0 , "p_l":13.33,\
-                               "rho_r":1.0 ,   "v_r":0.0, "p_r":1e-8 ,\
-                               "gamma":5./3. , "title":"Relativistic Problem 1" }
-    problem_2_relativistic_parameters = {"rho_l":1.0 ,"v_l":0.0 , "p_l":1000.0,\
-                               "rho_r":1.0 ,   "v_r":0.0, "p_r":1e-2 ,\
-                               "gamma":5./3. , "title":"Relativistic Problem 2" }
-    problem_3_relativistic_parameters = {"rho_l":1.0 ,"v_l":0.9 , "p_l":1.0,\
-                               "rho_r":1.0 ,   "v_r":0.0, "p_r":10.0 ,\
-                               "gamma":4./3. , "title":"Relativistic Problem 3" }
-    nonrelativistic_parameters = {"rho_l":1.0 ,"v_l":0.0 , "p_l":1.0,\
-                               "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
-                               "gamma":1.4 , "title":"NonRelativistic" }
-
     # params = nonrelativistic_parameters
     params = problem_2_relativistic_parameters
 
     e.setSod( params=params )
     title += " {} Sod".format( params['title'] )
-
-
-
 
     # SMOOTH WAVE 
     # e.setSmoothWave()
