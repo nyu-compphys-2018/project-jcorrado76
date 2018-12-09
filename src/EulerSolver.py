@@ -129,7 +129,6 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
-            print(self.W[1,:])
             self.cs = get_sound_speed( self.W[0,:] , self.W[2,:], self.gamma )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
@@ -170,10 +169,10 @@ class EulerSolver:
         ap = np.empty( self.Nx+1 )
         am = np.empty( self.Nx+1 )
 
-        UL , UR = self.state_reconstructor.Reconstruct_States( U=self.U, theta=1.5 )
-
-        WL = cons_to_prim( UL , self.gamma)
-        WR = cons_to_prim( UR, self.gamma )
+        theta = 1.5
+        UL , UR = self.state_reconstructor.Reconstruct_States( U=self.U,theta=theta )
+        W = cons_to_prim( U ,self.gamma)
+        WL , WR = self.state_reconstructor.Reconstruct_States( W , theta = theta )
         csL = get_sound_speed( WL[0,:] , WL[2,:] ,self.gamma)
         csR = get_sound_speed( WR[0,:] , WR[2,:] ,self.gamma)
 

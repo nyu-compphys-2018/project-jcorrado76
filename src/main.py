@@ -10,7 +10,7 @@ def main():
     order = 'low'
     # order = 'high'
     tfinal = 0.4
-    CFL = 0.4
+    CFL = 0.3
     N = 400
     if order == 'low':
         title = "Low Order in Space Low order in Time"
