@@ -1,8 +1,9 @@
 from numpy import sqrt
 from utils import lorentz_factor,specific_internal_energy,specific_enthalpy
+from utils import lorentz_factor
 def fp( p , D , S , tau , gamma=1.4):
     vstar = S / ( tau + p + D )
-    wstar = 1. / sqrt( 1 - vstar * vstar )
+    wstar = lorentz_factor( vstar )
     rstar = D / wstar
     estar = ( tau + D * ( 1. - wstar ) + ( 1 - wstar * wstar ) * p ) / ( D * wstar )
     return (( gamma - 1.) * rstar * estar - p)

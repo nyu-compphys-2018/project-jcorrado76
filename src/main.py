@@ -11,17 +11,17 @@ def main():
     # order = 'high'
     tfinal = 0.4
     CFL = 0.4
-    N = 500
+    N = 400
     if order == 'low':
         title = "Low Order in Space Low order in Time"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
-                time_order=3,spatial_order=1)
+                time_order=1,spatial_order=2)
     else:
         title = "High Order"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
 
     # params = nonrelativistic_parameters
-    params = problem_2_relativistic_parameters
+    params = problem_1_relativistic_parameters
 
     e.setSod( params=params )
     title += " {} Sod".format( params['title'] )

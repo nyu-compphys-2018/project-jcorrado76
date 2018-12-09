@@ -129,6 +129,7 @@ class EulerSolver:
     def evolve(self, tfinal):
         self.tfinal=tfinal
         while self.t < tfinal: # while time less than tfinal
+            print(self.W[1,:])
             self.cs = get_sound_speed( self.W[0,:] , self.W[2,:], self.gamma )
             dt = self.get_dt()
             if self.t+dt > tfinal: # if we're about to overshoot,
@@ -163,7 +164,6 @@ class EulerSolver:
         return(dt)
 
     def LU(self , U=None):
-        # using dirichlet boundary conditions by not updating ghost cells
         if U is None:
             U = self.U
         LU = np.zeros((3,self.Nx))

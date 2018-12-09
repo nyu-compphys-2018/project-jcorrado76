@@ -38,7 +38,7 @@ class State_Reconstructor( object ):
         UIL = np.zeros((3,self.Nx+1))
         UIR = np.zeros((3,self.Nx+1))
         for i in range( self.Nx+1 ):
-            UIR[:,i] = self.U[:,i+1] + 0.5 *\
+            UIL[:,i] = self.U[:,i+1] + 0.5 *\
             minmod( theta * ( self.U[:,i+1] - self.U[:,i]),\
             0.5 * ( self.U[:,i+2] - self.U[:,i] ) ,\
             theta * (self.U[:,i+2] - self.U[:,i+1]))

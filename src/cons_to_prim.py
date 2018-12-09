@@ -20,8 +20,8 @@ def cons_to_prim( U, gamma ):
 
     if (ps<0).any():
         print("Negative pressure")
-        ps = where(ps<0,fabs(S-tau-D),ps)
         print(ps)
+        ps = where(ps<0,fabs(S-tau-D),ps)
     if ( vs >= 1).any():
         print( "v greater than c")
         print(vs[vs>1])
