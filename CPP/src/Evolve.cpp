@@ -4,7 +4,8 @@ void EulerSolver::evolve( float tend ){
     tfinal = tend;
     float t = 0.0;
     while(t < tfinal){
-        cs = get_sound_speed( rho , p );
+        std::cout << "Time: " << t << std::endl;
+        get_sound_speed( rho , p , cs);
         float dt = get_dt();
         if ( t + dt > tfinal ){ // avoid overshooting 
             dt = tfinal - t;
@@ -14,7 +15,7 @@ void EulerSolver::evolve( float tend ){
         }else{
             RK3_Update( dt );
         }
-        cons_to_prim( &rho , &rhov , &energy , &v , &p );
+        cons_to_prim( rho , rhov , energy , v , p );
         fill_BCs();
         t += dt;
     }

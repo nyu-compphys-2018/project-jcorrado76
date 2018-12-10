@@ -4,7 +4,7 @@ float compute_rho_flux( float rho , float v ){
     return rho * v ;
 }
 float compute_rhov_flux( float rho , float v , float p ){
-    return r * v * v + p;
+    return rho * v * v + p;
 }
 float compute_energy_flux( float v , float p , float E ){
     return (E + p)*v;
@@ -21,5 +21,6 @@ void EulerSolver::Physical_Flux( const std::vector<float> rho , const std::vecto
         rhov_flux[i] = compute_rhov_flux( rho[i] , v[i] , p[i]);
         E = compute_total_energy_density( rho[i] , v[i] , p[i] , gamma );
         total_energy_density_flux[i] = compute_energy_flux( v[i], p[i], E );
+    }
 }
 
