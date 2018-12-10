@@ -1,0 +1,2 @@
+\section{Ghost cells}
+In order to reconstruct the states to the left and right of the first and last interface, I needed to use imaginary ghost cells in which I fill the values of the conserved quantities as specified by the boundary conditions each iteration. I then could use these values of the ghost cells in order to compute the left and right states during reconstruction. For first order in space, I only needed one ghost cell, whereas for second order in space, when I did the TVD minmod reconstruction, I needed two ghost cells on either side.
