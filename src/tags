@@ -1,0 +1,83 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+EulerSolver	EulerSolver.py	/^class EulerSolver:$/;"	c
+HLLE_Flux	numerical_flux.py	/^def HLLE_Flux( UL, UR , FL , FR , am , ap ):$/;"	f
+Initial_Conditions	initial_conditions.py	/^class Initial_Conditions( object ):$/;"	c
+LU	EulerSolver.py	/^    def LU(self , U=None):$/;"	m	class:EulerSolver
+N	exact_riemann.py	/^    N = 1000$/;"	v
+P0	exact_riemann.py	/^    P0 = 1.0$/;"	v
+PL	exact_riemann.py	/^    PL = 1.0$/;"	v
+PR	exact_riemann.py	/^    PR = 0.125$/;"	v
+Physical_Fluxes	EulerSolver.py	/^    def Physical_Fluxes( self , W ):$/;"	m	class:EulerSolver
+Piecewise_Constant	Reconstruct_States.py	/^    def Piecewise_Constant( self ):$/;"	m	class:State_Reconstructor
+Piecewise_Linear	Reconstruct_States.py	/^    def Piecewise_Linear( self , theta ):$/;"	m	class:State_Reconstructor
+Reconstruct_States	Reconstruct_States.py	/^    def Reconstruct_States( self , U=None , theta=1.5 ):$/;"	m	class:State_Reconstructor
+State_Reconstructor	Reconstruct_States.py	/^class State_Reconstructor( object ):$/;"	c
+__init__	EulerSolver.py	/^    def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):$/;"	m	class:EulerSolver
+__init__	Reconstruct_States.py	/^    def __init__(self , time_order=1,spatial_order=1,method=""):$/;"	m	class:State_Reconstructor
+__init__	initial_conditions.py	/^    def __init__(self, W , U ,  params, method="" ):$/;"	m	class:Initial_Conditions
+a	exact_riemann.py	/^    a = -1.0$/;"	v
+a	exact_riemann.py	/^    a = 0.0$/;"	v
+alpha	exact_riemann.py	/^    alpha = 0.1$/;"	v
+alphaM	alphas.py	/^def alphaM( WL , csL , WR , csR ):$/;"	f
+alphaP	alphas.py	/^def alphaP( WL , csL , WR , csR ):$/;"	f
+axes	EulerSolver.py	/^    axes = e.plot(title=title)$/;"	v	class:EulerSolver
+b	exact_riemann.py	/^    b = 1.0$/;"	v
+b	exact_riemann.py	/^    b = 2.0$/;"	v
+cfl	EulerSolver.py	/^    cfl = 0.3$/;"	v	class:EulerSolver
+check_if_negative_pressures	utils.py	/^def check_if_negative_pressures( pressures ):$/;"	f
+compute_l1_error	utils.py	/^def compute_l1_error( numerical , exact , deltaX ):$/;"	f
+cons_to_prim	cons_to_prim.py	/^def cons_to_prim( U, gamma ):$/;"	f
+dfp	newton.py	/^def dfp(p , D , S , tau , gamma=1.4):$/;"	f
+evolve	EulerSolver.py	/^    def evolve(self, tfinal):$/;"	m	class:EulerSolver
+f	utils.py	/^def f(x,x0,sigma):$/;"	f
+fill_BCs	EulerSolver.py	/^    def fill_BCs( self , U=None ):$/;"	m	class:EulerSolver
+fit_line	utils.py	/^def fit_line( xdata , ydata ):$/;"	f
+fp	newton.py	/^def fp( p , D , S , tau , gamma=1.4):$/;"	f
+gamma	exact_riemann.py	/^    gamma = 1.4$/;"	v
+gamma	exact_riemann.py	/^    gamma = 5.0\/3.0$/;"	v
+get_dt	EulerSolver.py	/^    def get_dt(self ):$/;"	m	class:EulerSolver
+get_sound_speed	sound_speed.py	/^def get_sound_speed(r , p, gamma ):$/;"	f
+init_labels	EulerSolver.py	/^    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']$/;"	v	class:EulerSolver
+isentropicWave	exact_riemann.py	/^def isentropicWave(a, b, N, t, x0, sigma, alpha, gamma, rho0=1.0, P0=1.0,$/;"	f
+lambdaM	eigenvalues.py	/^def lambdaM( v , cs ):$/;"	f
+lambdaP	eigenvalues.py	/^def lambdaP( v , cs ):$/;"	f
+line	utils.py	/^def line( x , b , m ):$/;"	f
+lorentz_factor	utils.py	/^def lorentz_factor( v ):$/;"	f
+main	main.py	/^def main():$/;"	f
+minmod	Reconstruct_States.py	/^def minmod( x , y , z ):$/;"	f
+newton	newton.py	/^def newton( func , fprime , x0 , *args, tol=1e-12 ):$/;"	f
+order	EulerSolver.py	/^    order = 'high'$/;"	v	class:EulerSolver
+plot	EulerSolver.py	/^    def plot(self,title="",color='k'):$/;"	m	class:EulerSolver
+prim_to_cons	EulerSolver.py	/^    def prim_to_cons( self , W ):$/;"	m	class:EulerSolver
+rho0	exact_riemann.py	/^    rho0 = 1.0$/;"	v
+rhoL	exact_riemann.py	/^    rhoL = 1.0$/;"	v
+rhoProfile	exact_riemann.py	/^    def rhoProfile(x, x0, alpha, sigma, rho0):$/;"	f	function:isentropicWave
+rhoR	exact_riemann.py	/^    rhoR = 0.1$/;"	v
+riemann	exact_riemann.py	/^def riemann(a, b, x0, N, T, rhoL, vL, PL, rhoR, vR, PR, gamma,$/;"	f
+riemann_f	exact_riemann.py	/^def riemann_f(p, rho, v, P, gamma, A, B, cs):$/;"	f
+setIsentropicWave	EulerSolver.py	/^    def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):$/;"	m	class:EulerSolver
+setIsentropicWave	initial_conditions.py	/^def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):$/;"	f
+setSmoothWave	EulerSolver.py	/^    def setSmoothWave( self ):$/;"	m	class:EulerSolver
+setSmoothWave	initial_conditions.py	/^def setSmoothWave( self ):$/;"	f
+setSod	EulerSolver.py	/^    def setSod( self ,  x0=0.5 , params=None ):$/;"	m	class:EulerSolver
+setSod	initial_conditions.py	/^def setSod( self ,  x0=0.5 , params=None ):$/;"	f
+sigma	exact_riemann.py	/^    sigma = 0.3$/;"	v
+specific_enthalpy	utils.py	/^def specific_enthalpy( rho , pressure , e ):$/;"	f
+specific_internal_energy	utils.py	/^def specific_internal_energy( rho , pressure , gamma=1.4 ):$/;"	f
+t	exact_riemann.py	/^    t = 0.25$/;"	v
+t	exact_riemann.py	/^    t = 0.7$/;"	v
+tfinal	EulerSolver.py	/^    tfinal = 0.1$/;"	v	class:EulerSolver
+title	EulerSolver.py	/^    title="Isentropic Wave"$/;"	v	class:EulerSolver
+update_conservative_variables_RK3	EulerSolver.py	/^    def update_conservative_variables_RK3(self,dt):$/;"	m	class:EulerSolver
+update_conservative_variables_forward_euler	EulerSolver.py	/^    def update_conservative_variables_forward_euler( self , dt ):$/;"	m	class:EulerSolver
+update_primitive_variables	EulerSolver.py	/^    def update_primitive_variables(self):$/;"	m	class:EulerSolver
+vL	exact_riemann.py	/^    vL = 0.0$/;"	v
+vR	exact_riemann.py	/^    vR = 0.0$/;"	v
+winit	EulerSolver.py	/^    winit = e.W.copy()$/;"	v	class:EulerSolver
+x0	exact_riemann.py	/^    x0 = 0.0$/;"	v
+x0	exact_riemann.py	/^    x0 = 0.5$/;"	v
