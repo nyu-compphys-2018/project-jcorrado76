@@ -8,6 +8,7 @@ from sound_speed import get_sound_speed
 from Reconstruct_States import State_Reconstructor
 from cons_to_prim import cons_to_prim
 from prim_to_cons import prim_to_cons
+from initial_conditions import  Initial_Conditions
 
 class EulerSolver:
     def __init__(self, Nx=10 ,  a=0.0 , b=1.0 ,cfl=0.5, spatial_order=1, time_order=1, bc='outflow',gamma=1.4):
@@ -22,8 +23,14 @@ class EulerSolver:
 
         if self.spatial_order == 1:
             self.Ng = 1
+            self.title = "First Order in Space"
         else:
             self.Ng = 2
+            self.title = "Second Order in Space"
+        if self.time_order == 1:
+            self.title += " First Order in Time"
+        elif self.time_order != 1:
+            self.title += " Third Order in Time"
 
         self.state_reconstructor = State_Reconstructor(self.time_order , self.spatial_order)
 
@@ -51,40 +58,8 @@ class EulerSolver:
         self.cs = np.zeros(self.grid_size)
         self.gamma = gamma
 
-    def setSod( self ,  x0=0.5 , params=None ):
-        """
-        x0 - Float , value of x position to be the center of the riemann problem
-        left-states - density, velocity , pressure
-        right-states - density , velocity , pressure
-        gamma - thermodynamic gamma to use for the evolution of fluid
-        """
-        if params is None:
-            print("Need to set sod parameters")
-        self.gamma = params['gamma']
-        self.W[0,:] = np.where( self.x <= x0 , params['rho_l'] , params['rho_r'] )
-        self.W[1,:] = np.where( self.x <= x0 , params['v_l'] , params['v_r'] )
-        self.W[2,:] = np.where( self.x <= x0 , params['p_l'] , params['p_r'] )
-
-        self.U[:,:] = prim_to_cons( self.W , self.gamma )
-    def setIsentropicWave( self , rho0 , p0 , alpha , f , *args ):
-        initial_wave = f( self.x , *args )
-        rho = rho0 * (1.0 + alpha * initial_wave)
-        p = p0 * ( rho / rho0 ) ** self.gamma
-        cs = get_sound_speed(rho ,p,self.gamma)
-        v = (2. / (self.gamma-1.) ) * (cs - get_sound_speed(rho0,p0),self.gamma)
-
-        self.U[0,:] = rho
-        self.U[1,:] = rho * v
-        self.U[2,:] = ( p / (self.gamma-1.))+(rho*v*v/2.)
-        self.W[0,:] = rho
-        self.W[1,:] = v
-        self.W[2,:] = p
-        self.U[:,:] = prim_to_cons( self.W , self.gamma )
-    def setSmoothWave( self ):
-        self.W[0,:] = np.sin(2 * np.pi * self.x)+2.0
-        self.W[1,:] = 0.0
-        self.W[2,:] = 1.0
-        self.U[:,:] = prim_to_cons( self.W , self.gamma )
+        # initial conditions object
+        self.IC_manager = Initial_Conditions( self.W , self.U , self.x )
 
     def update_conservative_variables_RK3(self,dt):
         Un = self.U
@@ -93,14 +68,13 @@ class EulerSolver:
 
         update = dt * self.LU( Un )
         U1[:,self.physical] = Un[:,self.physical] + update
-        # self.fill_BCs(U1)
+        self.fill_BCs(U1)
         update = dt * self.LU( U1 )
         U2[:,self.physical] = (1./4.)*( 3. * Un[:,self.physical] + U1[:,self.physical] + update )
-        # self.fill_BCs(U2)
+        self.fill_BCs(U2)
         update = dt * self.LU( U2 )
         self.U[:,self.physical] = \
         (1./3.)* (Un[:,self.physical] + 2. * U2[:,self.physical] + 2. * update )
-        # self.fill_BCs(self.U)
 
     def update_conservative_variables_forward_euler( self , dt ):
         """
@@ -128,6 +102,7 @@ class EulerSolver:
 
     def evolve(self, tfinal):
         self.tfinal=tfinal
+        self.title += " to time t={}".format(self.tfinal)
         while self.t < tfinal: # while time less than tfinal
             self.cs = get_sound_speed( self.W[0,:] , self.W[2,:], self.gamma )
             dt = self.get_dt()
@@ -193,11 +168,7 @@ class EulerSolver:
     def plot(self,title="",color='k'):
         labels = [r'$\rho$',r'$v$',r'$P$']
         fig, axes = plt.subplots(nrows=3,ncols=1, sharex=True)
-        if title == "":
-            title = "Sod Shock Tube Simulation"
-        title += " to time t={}".format(self.tfinal)
-
-        fig.suptitle( title ,fontsize=16)
+        fig.suptitle( self.title ,fontsize=16)
         for i, axis in enumerate(axes):
             axis.plot( self.x[self.physical] , self.W[i,self.physical], label=labels[i])
             axis.set_title(labels[i])
@@ -205,30 +176,3 @@ class EulerSolver:
             axis.legend()
         plt.xlabel('x')
         return (axes)
-
-if __name__=="__main__":
-    tfinal = 0.1
-    order = 'high'
-    cfl = 0.3
-    if order == 'low':
-        e = eulersolver( nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=1 , spatial_order=1 , bc='outflow' )
-    if order == 'high':
-        e = eulersolver( nx=400 , a=0.0 , b=1.0 , cfl=cfl, time_order=3 , spatial_order=2 , bc='outflow' )
-    e.setsod()
-    # e.setsmoothwave()
-    title="isentropic wave"
-    # rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    # e.setisentropicwave(rho0,p0,alpha,f,x0,sigma)
-    # save initial configuration
-    winit = e.w.copy()
-    # evolve to final time
-    e.evolve( tfinal )
-    # plot the euler solver and capture resultant axes
-    axes = e.plot(title=title)
-    # add the initial configurations on each subplot
-    init_labels = ['initial density','initial velocity','initial pressure']
-    for i, axis in enumerate(axes):
-        axis.plot( e.x , winit[i,:], label=init_labels[i],linestyle='dashed',alpha=0.7)
-        axis.legend()
-
-    plt.show()

@@ -25,6 +25,9 @@ a	exact_riemann.py	/^    a = 0.0$/;"	v
 alpha	exact_riemann.py	/^    alpha = 0.1$/;"	v
 alphaM	alphas.py	/^def alphaM( WL , csL , WR , csR ):$/;"	f
 alphaP	alphas.py	/^def alphaP( WL , csL , WR , csR ):$/;"	f
+anim	Create_Animation.py	/^    anim = animation.FuncAnimation(fig, animate, init_func=initialize_animation,$/;"	v
+animate	Create_Animation.py	/^def animate(t):$/;"	f
+ax	Create_Animation.py	/^    ax = plt.axes(xlim=(0, 1), ylim=(-2, 2))$/;"	v
 axes	EulerSolver.py	/^    axes = e.plot(title=title)$/;"	v	class:EulerSolver
 b	exact_riemann.py	/^    b = 1.0$/;"	v
 b	exact_riemann.py	/^    b = 2.0$/;"	v
@@ -35,6 +38,7 @@ cons_to_prim	cons_to_prim.py	/^def cons_to_prim( U, gamma ):$/;"	f
 dfp	newton.py	/^def dfp(p , D , S , tau , gamma=1.4):$/;"	f
 evolve	EulerSolver.py	/^    def evolve(self, tfinal):$/;"	m	class:EulerSolver
 f	utils.py	/^def f(x,x0,sigma):$/;"	f
+fig	Create_Animation.py	/^    fig = plt.figure()$/;"	v
 fill_BCs	EulerSolver.py	/^    def fill_BCs( self , U=None ):$/;"	m	class:EulerSolver
 fit_line	utils.py	/^def fit_line( xdata , ydata ):$/;"	f
 fp	newton.py	/^def fp( p , D , S , tau , gamma=1.4):$/;"	f
@@ -42,7 +46,8 @@ gamma	exact_riemann.py	/^    gamma = 1.4$/;"	v
 gamma	exact_riemann.py	/^    gamma = 5.0\/3.0$/;"	v
 get_dt	EulerSolver.py	/^    def get_dt(self ):$/;"	m	class:EulerSolver
 get_sound_speed	sound_speed.py	/^def get_sound_speed(r , p, gamma ):$/;"	f
-init_labels	EulerSolver.py	/^    init_labels = ['Initial Density','Initial Velocity','Initial Pressure']$/;"	v	class:EulerSolver
+init_labels	EulerSolver.py	/^    init_labels = ['initial density','initial velocity','initial pressure']$/;"	v	class:EulerSolver
+initialize_animation	Create_Animation.py	/^def initialize_animation():$/;"	f
 isentropicWave	exact_riemann.py	/^def isentropicWave(a, b, N, t, x0, sigma, alpha, gamma, rho0=1.0, P0=1.0,$/;"	f
 lambdaM	eigenvalues.py	/^def lambdaM( v , cs ):$/;"	f
 lambdaP	eigenvalues.py	/^def lambdaP( v , cs ):$/;"	f
@@ -53,7 +58,7 @@ minmod	Reconstruct_States.py	/^def minmod( x , y , z ):$/;"	f
 newton	newton.py	/^def newton( func , fprime , x0 , *args, tol=1e-12 ):$/;"	f
 order	EulerSolver.py	/^    order = 'high'$/;"	v	class:EulerSolver
 plot	EulerSolver.py	/^    def plot(self,title="",color='k'):$/;"	m	class:EulerSolver
-prim_to_cons	EulerSolver.py	/^    def prim_to_cons( self , W ):$/;"	m	class:EulerSolver
+prim_to_cons	prim_to_cons.py	/^def prim_to_cons( W ,gamma):$/;"	f
 rho0	exact_riemann.py	/^    rho0 = 1.0$/;"	v
 rhoL	exact_riemann.py	/^    rhoL = 1.0$/;"	v
 rhoProfile	exact_riemann.py	/^    def rhoProfile(x, x0, alpha, sigma, rho0):$/;"	f	function:isentropicWave
@@ -72,12 +77,12 @@ specific_internal_energy	utils.py	/^def specific_internal_energy( rho , pressure
 t	exact_riemann.py	/^    t = 0.25$/;"	v
 t	exact_riemann.py	/^    t = 0.7$/;"	v
 tfinal	EulerSolver.py	/^    tfinal = 0.1$/;"	v	class:EulerSolver
-title	EulerSolver.py	/^    title="Isentropic Wave"$/;"	v	class:EulerSolver
+title	EulerSolver.py	/^    title="isentropic wave"$/;"	v	class:EulerSolver
 update_conservative_variables_RK3	EulerSolver.py	/^    def update_conservative_variables_RK3(self,dt):$/;"	m	class:EulerSolver
 update_conservative_variables_forward_euler	EulerSolver.py	/^    def update_conservative_variables_forward_euler( self , dt ):$/;"	m	class:EulerSolver
 update_primitive_variables	EulerSolver.py	/^    def update_primitive_variables(self):$/;"	m	class:EulerSolver
 vL	exact_riemann.py	/^    vL = 0.0$/;"	v
 vR	exact_riemann.py	/^    vR = 0.0$/;"	v
-winit	EulerSolver.py	/^    winit = e.W.copy()$/;"	v	class:EulerSolver
+winit	EulerSolver.py	/^    winit = e.w.copy()$/;"	v	class:EulerSolver
 x0	exact_riemann.py	/^    x0 = 0.0$/;"	v
 x0	exact_riemann.py	/^    x0 = 0.5$/;"	v
