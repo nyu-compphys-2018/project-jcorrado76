@@ -1,6 +1,7 @@
 #include "EulerSolver.h"
 
 void EulerSolver::evolve( float tend ){
+    feenableexcept( FE_DIVBYZERO || FE_INVALID || FE_OVERFLOW ); // this stops program if any division by zero, nans, or overflow occurs
     tfinal = tend;
     float t = 0.0;
     while(t < tfinal){

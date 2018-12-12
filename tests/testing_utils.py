@@ -33,7 +33,7 @@ def run_sod_test( parameters=None ):
         title = "Third Order in Time Second Order in Space"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
 
-    e.setSod( params = parameters )
+    e.IC_manager.setSod( params = parameters )
     title += " {}".format( parameters['title'] )
 
     e.evolve( tfinal )

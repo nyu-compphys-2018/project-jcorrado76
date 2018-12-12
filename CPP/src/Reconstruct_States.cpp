@@ -15,6 +15,26 @@ void EulerSolver::Reconstruct_States( const std::vector<float> &rhos , const std
             rho_Rs[i] = rhos[ ilo + i ];
             rhov_Rs[i] = rhovs[ ilo + i ];
             E_Rs[i] = Es[ ilo + i ];
+
+            if ( std::isnan(rhos[ilo+i-1]) ){
+                std::cout << "nan in rhoLs at " << ilo+i-1 << ": " << rho_Ls[ilo+i-1] << std::endl;
+            }
+            if ( std::isnan(rhovs[ilo+i-1]) ){
+                std::cout << "nan in rhovLs at " << ilo+i-1 << ": " << rhov_Ls[ilo+i-1] << std::endl;
+            }
+            if ( std::isnan(Es[ilo+i-1]) ){
+                std::cout << "nan in ELs at " << ilo+i-1 << ": " << E_Ls[ilo+i-1] << std::endl;
+            }
+            if ( std::isnan(rhos[ilo+i]) ){
+                std::cout << "nan in rhoRs at " << ilo+i << ": " << rho_Rs[ilo+i-1] << std::endl;
+            }
+            if ( std::isnan(rhovs[ilo+i]) ){
+                std::cout << "nan in rhovRs at " << ilo+i << ": " << rhov_Rs[ilo+i-1] << std::endl;
+            }
+            if ( std::isnan(Es[ilo+i]) ){
+                std::cout << "nan in ERs at " << ilo+i  << ": " << E_Rs[ilo+i-1] << std::endl;
+            }
+            
         }
     }else{}
 }

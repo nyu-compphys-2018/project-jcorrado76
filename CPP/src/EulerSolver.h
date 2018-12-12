@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <fenv.h> // this include to have functions to stop when nan is encountered
 
 class EulerSolver{
     private:
@@ -56,7 +57,7 @@ class EulerSolver{
         };
         float lambdaP( float v , float cs );
         float lambdaM( float v , float cs );
-        void setSod( float x0=0.5 , float rho_=1. , float v_l=0. , float p_l=1. , float rho_r=0.125 , float v_r=0.0 , float p_r=0.1 , float gam=1.4 );
+        void setSod( float x0=0.5 , float rho_L=1. , float v_l=0. , float p_l=1. , float rho_r=0.125 , float v_r=0.0 , float p_r=0.1 , float gam=1.4 );
         void get_sound_speed( const std::vector<float> &rho , const std::vector<float> &p , std::vector<float> &cslocal);
         void Forward_Euler_Update( float dt );
         void RK3_Update( float dt );

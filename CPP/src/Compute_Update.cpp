@@ -31,10 +31,18 @@ void EulerSolver::LU( const std::vector<float> rho , const std::vector<float> rh
     std::vector<float> fr_2(Nx+1);
     std::vector<float> fr_3(Nx+1);
 
+    for ( int i = 0 ; i < grid_size ; i++ ){
+        if ( std::isnan(rho[i]) || std::isnan( rhov[i]) || std::isnan( E[i] ) ){
+            std::cout << "Detected nan in time averaged states" << std::endl;
+            return;
+        }
+    }
+
     // Reconstruct left and right states 
     Reconstruct_States(  rho ,  rhov ,  energy , 
                          rho_Ls ,  rhov_Ls ,  E_Ls ,
                          rho_Rs ,  rhov_Rs ,  E_Rs );
+
 
     for ( int i = 0 ; i < Nx+1 ; i++ ){
         if ( std::isnan(rho_Ls[i]) || std::isnan( rho_Rs[i]) || std::isnan( rhov_Ls[i] ) ){

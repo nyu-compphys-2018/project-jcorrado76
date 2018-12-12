@@ -15,10 +15,10 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 	#g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 main.exe: $(OBJ_FILES)
-	g++ -o $@ $^
+	g++ -g -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	g++ -c -o $@ $<
+	g++ -g -c -o $@ $<
 
 plots: plots/sod_shock_tube.jpg
 	python plot_final_state.py
