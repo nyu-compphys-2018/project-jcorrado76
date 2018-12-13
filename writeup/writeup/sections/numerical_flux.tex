@@ -1,3 +1,2 @@
 \section{Numerical Flux}
-
-Once I have computed the physical fluxes, I can solve the riemann problem at each of the boundaries using a high resolution shock capturing approximate riemann solver. In this case, I used the HLL approximate riemann solver for special relativistic hydrodynamical simulations.
+Computing the exact solution to the riemann problem at the boundary of each of the cells is computationally expensive because it involves iterations over all of the cells for every timestep. In order to avoid doing this to be more computationally efficient, modern high resolution shock capturing schemes employ approximate riemann solvers to numerically approximate the solutions to the riemann problem at each of the boundaries. In my project, I used one of the simplest numerical flux functions, the 

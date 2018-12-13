@@ -1,2 +1,4 @@
 \section{Physical Fluxes}
-In order to compute the FHLL fluxes at each of the boundaries, I need to compute the physical fluxes for each of the time averaged conserved quantities in each cell, as prescribed by the euler equations. Then I can use these physical fluxes to compute the fluxes of the left and right states and then compute the FHLL flux at each boundary.
+We can compute the physical fluxes from the expressions for the fluxes as a function of the conserved variables and primitive variables. The physical fluxes are given from the euler equations by:
+$$F = \begin{bmatrix} \rho v\\ \rho v^2 +p \\ (E+p)v \end{bmatrix}$$
+After retrieving the primitives from the conserved variables, we can compute the physical fluxes for each of the physical cells. 

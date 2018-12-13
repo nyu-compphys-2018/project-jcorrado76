@@ -1,0 +1,26 @@
+\section{Overall Structure}
+The overall structure of a hydrocode is given below:
+Every high resolution shock capturing method consists of three parts:
+\begin{enumerate}
+        \item Reconstruct the left and right states at cell boundaries
+        \item Use an approximate numerical riemann solver at each interface 
+        \item Use a time update fof at least second order in time 
+\end{enumerate}
+
+The pseudo code for a one dimensional special-relativistic code in cartesian coordinates is given by:
+
+\begin{algorithm}
+        Setup_Grid // initialize the grid data structure\;
+        Set_ICs // setup initial conditions\;
+        \While{ time < tfinal}{
+                compute the timestep // obey CFL condition using eigenvalues\;
+                advance the time coordinate\;
+                \For{ substep in runge kutta substeps }{
+                        reconstruct variables at cell boundaries\;
+                        recover primitve variables\;
+                        compute numerical fluxes using approximate riemann solver\;
+                        compute the runge-kutta update\;
+                }
+        }
+        Apply boundary conditions
+\end{algorithm}

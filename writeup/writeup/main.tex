@@ -3,6 +3,11 @@
 % Last Change: Sun Dec 09 07:00 PM 2018 E
 %
 \documentclass[a4paper]{article}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\graphicspath{{img/}}
 \begin{document}
 
 \title{Relativistic Hydrocode}
@@ -13,8 +18,8 @@ Chris Tiede}
 \pagebreak
 
 \input{sections/reconstruction}
-\input{sections/numerical_flux}
 \input{sections/physical_flux}
+\input{sections/numerical_flux}
 \input{sections/ghost_cells}
 \input{sections/cons_to_prim}
 \end{document}

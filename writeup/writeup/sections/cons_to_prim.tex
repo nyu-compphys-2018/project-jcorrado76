@@ -1,2 +1,35 @@
 \section{Retrieving the Primitives from the Conserved Variables}
-In order to compute the numerical FHLL flux, I needed to recover the primitive variables from the conserved ones at least once per iteration. For the nonrelativistic case, this was easy because the expressions for recovering the primitive variables can be derived in a straightforward manner from the euler equations. Conversely, for the relativistic case, retrieving the primitives becomes slightly more complicated, as it involved iterating over a nonlinear root-finding algorithm in order to retrieve one of the primitives, which I then used to compute the remaining missing ones.
+In order to compute the physical and numerical fluxes, one needs to retrieve the primitive variables from the conserved variables at least once per timestep. For the nonrelativistic case, the prescription for computing the primitive variables comes directly from a manipulation of the euler equations. 
+\subsection{Nonrelativistic Case}
+The equations for one dimensional hydrodynamics are given by:
+$$\frac{\partial \bm{U}}{\partial t}+\frac{\partial \bm{F}}{\partial x} = 0$$
+Where the conserved variables are: 
+$$\bm{U}= \begin{bmatrix} \rho \\ \rho v\\ E \end{bmatrix}$$
+and the fluxes are given by:
+$$\bm{F}=\begin{bmatrix} \rho v \\ \rho v^2 +P \\ (E+P)v \end{bmatrix}$$
+The first primitive $\rho$ is given by the first component of the conserved vector. The second primitive, $v$, is given by the second component of the conserved vector, divided by the first component of the conserved vector. The third primitive, the pressure can be obtained from the conserved variables once we introduce an equation of state in order to close the system of equations. If we assume an ideal gas equation of state:
+$$p(\rho,e)=(\Gamma-1)\rho e$$
+Using the expression for the total energy density:
+$$E=\rho e +\frac{1}{2}\rho v^2$$
+We can use the equation of state to eliminate the specific internal energy ($e$). Doing this yields the expression:
+$$p=\left(E-\frac{1}{2}\rho v^2\right)(\Gamma-1)$$
+which can be obtained by using the components of the conserved vector. \\
+
+\subsection{Relativistic Case}
+In the relativistic case, the conserved variables become heavily coupled via the lorentz factor as we consider velocities a substantial fraction of the speed of light. For the relativistic case, the conserved variables are given by:
+$$U=\begin{bmatrix}D \\ S_j \\ \tau \end{bmatrix} = \begin{bmatrix}\rho W \\ \rho h W^2 v_j \\ D(hW-1)-p \end{bmatrix}$$
+However, trying to retrieve the primitive variables from those expressions for the conserved variables cannot be done analytically. So, we need to use a root-finding algorithm in order to retrieve the pressure every timestep. Using the pressure and the conserved variables, we can then retrieve the rest of the primitive variables. \\
+In my code, I implemented a newton-raphson root-finding algorithm to solve for the optimal value of the pressure for each cell using the equation of state and an implicit expression for pressure of the state. The implicit expression for the pressure is of the form:
+$$p-\overline{p}[\rho(\bm{U},p),e(\bm{U},p)]=0$$
+Where $\overline{p}$ is given by the equation of state. My expressions in order to calculate the value of the equation of state, evaluated at my current guess for the pressure, and the current values of the conserved variables are given by:
+$$v^{*}=\frac{S_j}{\tau+p+D}$$
+$$W^{*}=\frac{1}{\sqrt{1-(v^{*})^2}}$$
+$$\rho^{*}=\frac{D}{W^{*}}$$
+$$\epsilon^{*}=\frac{\tau +D(1-W^{*})+(1-(W^{*})^2)p}{DW^{*}}$$
+The implicit expression for the pressure that I used in my code is:
+$$(\Gamma-1)\rho^{*}\epsilon^{*}-p=0$$
+For the newton-raphson algorithm, I need to supply the derivative of the function for which I am trying to find the root of. In Numerical Hydrodynamics in Special Relativity, by Marti and Muller, it is stated that the derivative of the implicit function with respect to $\overline{p}$ can be approximated using the expression:
+$$\frac{df}{dp}=(v^{*})^2(cs^{*})^2-1$$
+Where the sound speed here is the relativistic one, and is evaluated using our current guess for the pressure and the current value of the conserved variables. This approximation has the property that it tends to the exact derivative as the solution is approached.\\
+One issue that I encountered with this was that sometimes I would get nonphysical results from the root-finding algorithm. In order to correct this, I checked for whenever there was a velocity greater than 1, or a pressure that was less than the theoretical minimum ($P_{min}=|S-\tau-D|$, as stated in Solving 1-D SRH Equations Using Different Numerical Method and Results - Donmez ), and corrected it by replacing the value with the minimum value for the pressure when the pressure went below, or a value for the velocity slightly below 1 whenever the velocity went above 1. However, I found that the problem was largely averted by retrieving the primitives before reconstructing the left and right conservative states, and then reconstructing the primitives directly. This method helped significantly for avoiding negative pressures, as opposed to reconstructing the conserved variables close to the boundary, and then retrieving the primitive variables from the reconstructed conserved variables.
+
