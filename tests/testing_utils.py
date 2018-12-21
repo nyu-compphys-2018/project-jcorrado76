@@ -26,15 +26,15 @@ def run_sod_test( parameters=None ):
     if parameters is None:
         sys.exit()
     if order == 'low':
-        title = "Low Order in Space Low order in Time"
+        title = "LowOrderSpaceLowOrderTime"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
                 time_order=1,spatial_order=1)
     else:
-        title = "Third Order in Time Second Order in Space"
+        title = "ThirdOrderTimeSecondOrderSpace"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL, time_order=3,spatial_order=2 )
 
     e.IC_manager.setSod( params = parameters )
-    title += " {}".format( parameters['title'] )
+    title += "{}".format( parameters['title'] )
 
     e.evolve( tfinal )
     axes = e.plot(title=title)

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 16:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 18:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -250,37 +250,146 @@ Package pdftex.def Info: img/HLLCFluxSolver.png  used on input line 49.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-) (./sections/ghost_cells.tex [7]) (./sections/cons_to_prim.tex [8 <./img/HLLCF
-luxSolver.png (PNG copy)>]
+) (./sections/eigenvalues.tex [7]) (./sections/ghost_cells.tex [8 <./img/HLLCFl
+uxSolver.png (PNG copy)>]) (./sections/cons_to_prim.tex [9]
 Underfull \hbox (badness 10000) in paragraph at lines 15--17
 
  []
 
-[9] [10]) [11] (./main.aux) ) 
+[10]) (./sections/modularity.tex) (./sections/test_cases.tex [11]
+<../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonrelativ
+isticSod.jpg, id=53, 3700.82625pt x 1926.19624pt>
+File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonre
+lativisticSod.jpg Graphic file (type jpg)
+<use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonrel
+ativisticSod.jpg>
+Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
+ceLowOrderTimeNonrelativisticSod.jpg  used on input line 6.
+(pdftex.def)             Requested size: 370.10431pt x 192.6309pt.
+
+Overfull \hbox (25.10431pt too wide) in paragraph at lines 6--7
+ [][] 
+ []
+
+<../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceNonR
+elativisticSod.jpg, id=54, 2630.82875pt x 1926.19624pt>
+File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
+eNonRelativisticSod.jpg Graphic file (type jpg)
+<use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
+NonRelativisticSod.jpg>
+Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceNonRelativisticSod.jpg  used on input line 12.
+(pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativist
+icSodProblem1.jpg, id=55, 2461.195pt x 1926.19624pt>
+File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
+ivisticSodProblem1.jpg Graphic file (type jpg)
+<use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelati
+visticSodProblem1.jpg>
+Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
+ceLowOrderTimeRelativisticSodProblem1.jpg  used on input line 18.
+(pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
+tivisticSodProblem1.jpg, id=56, 2630.82875pt x 1926.19624pt>
+File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
+eRelativisticSodProblem1.jpg Graphic file (type jpg)
+<use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
+RelativisticSodProblem1.jpg>
+Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceRelativisticSodProblem1.jpg  used on input line 24.
+(pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativist
+icSodProblem2.jpg, id=57, 2461.195pt x 1926.19624pt>
+File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
+ivisticSodProblem2.jpg Graphic file (type jpg)
+<use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelati
+visticSodProblem2.jpg>
+Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
+ceLowOrderTimeRelativisticSodProblem2.jpg  used on input line 30.
+(pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
+tivisticSodProblem2.jpg, id=58, 2630.82875pt x 1926.19624pt>
+File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
+eRelativisticSodProblem2.jpg Graphic file (type jpg)
+<use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
+RelativisticSodProblem2.jpg>
+Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceRelativisticSodProblem2.jpg  used on input line 36.
+(pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativist
+icSodProblem3.jpg, id=59, 2461.195pt x 1926.19624pt>
+File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
+ivisticSodProblem3.jpg Graphic file (type jpg)
+<use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelati
+visticSodProblem3.jpg>
+Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
+ceLowOrderTimeRelativisticSodProblem3.jpg  used on input line 42.
+(pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
+tivisticSodProblem3.jpg, id=60, 2630.82875pt x 1926.19624pt>
+File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
+eRelativisticSodProblem3.jpg Graphic file (type jpg)
+<use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
+RelativisticSodProblem3.jpg>
+Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceRelativisticSodProblem3.jpg  used on input line 48.
+(pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) [12 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonr
+elativisticSod.jpg>] [13 <../../plots/high_order_sod_shock_tube_plots/ThirdOrde
+rTimeSecondOrderSpaceNonRelativisticSod.jpg> <../../plots/low_order_sod_shock_t
+ube_plots/LowOrderSpaceLowOrderTimeRelativisticSodProblem1.jpg>] [14 <../../plo
+ts/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRelativisticSo
+dProblem1.jpg> <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrde
+rTimeRelativisticSodProblem2.jpg>] [15 <../../plots/high_order_sod_shock_tube_p
+lots/ThirdOrderTimeSecondOrderSpaceRelativisticSodProblem2.jpg> <../../plots/lo
+w_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativisticSodProblem3.j
+pg>] [16 <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrder
+SpaceRelativisticSodProblem3.jpg>] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 2332 strings out of 494847
- 31422 string characters out of 6179079
- 90935 words of memory out of 5000000
- 5595 multiletter control sequences out of 15000+600000
+ 2384 strings out of 494847
+ 35364 string characters out of 6179079
+ 90026 words of memory out of 5000000
+ 5627 multiletter control sequences out of 15000+600000
  13934 words of font info for 49 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  41i,7n,25p,1040b,229s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb><
-/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmsy7.pfb>
-Output written on main.pdf (11 pages, 509049 bytes).
+</usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
+Output written on main.pdf (16 pages, 3582055 bytes).
 PDF statistics:
- 92 PDF objects out of 1000 (max. 8388607)
- 62 compressed objects within 1 object stream
+ 116 PDF objects out of 1000 (max. 8388607)
+ 73 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
