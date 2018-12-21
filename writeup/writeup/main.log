@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  13 DEC 2018 03:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 16:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -231,38 +231,56 @@ File: img/boundary-extrapolated-values.png Graphic file (type png)
 Package pdftex.def Info: img/boundary-extrapolated-values.png  used on input li
 ne 52.
 (pdftex.def)             Requested size: 191.5121pt x 136.70833pt.
-) (./sections/physical_flux.tex)
-(./sections/numerical_flux.tex [4 <./img/minmod-mc.png (PNG copy)> <./img/bound
-ary-extrapolated-values.png (PNG copy)>]) (./sections/ghost_cells.tex)
-(./sections/cons_to_prim.tex [5]
+) (./sections/conserved_variables.tex
+[4 <./img/minmod-mc.png (PNG copy)> <./img/boundary-extrapolated-values.png (PN
+G copy)>]) (./sections/physical_flux.tex) (./sections/numerical_flux.tex
+[5]
+<img/HLLEFlux.png, id=31, 1403.2425pt x 1203.49625pt>
+File: img/HLLEFlux.png Graphic file (type png)
+<use img/HLLEFlux.png>
+Package pdftex.def Info: img/HLLEFlux.png  used on input line 14.
+(pdftex.def)             Requested size: 140.33246pt x 120.35667pt.
+ [6 <./img/HLLEFlux.png (PNG copy)>]
+<img/HLLCFluxSolver.png, id=35, 1144.275pt x 1005.7575pt>
+File: img/HLLCFluxSolver.png Graphic file (type png)
+<use img/HLLCFluxSolver.png>
+Package pdftex.def Info: img/HLLCFluxSolver.png  used on input line 49.
+(pdftex.def)             Requested size: 171.63383pt x 150.85712pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (./sections/ghost_cells.tex [7]) (./sections/cons_to_prim.tex [8 <./img/HLLCF
+luxSolver.png (PNG copy)>]
 Underfull \hbox (badness 10000) in paragraph at lines 15--17
 
  []
 
-[6]) [7] (./main.aux) ) 
+[9] [10]) [11] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 2319 strings out of 494847
- 31117 string characters out of 6179079
- 89935 words of memory out of 5000000
- 5587 multiletter control sequences out of 15000+600000
+ 2332 strings out of 494847
+ 31422 string characters out of 6179079
+ 90935 words of memory out of 5000000
+ 5595 multiletter control sequences out of 15000+600000
  13934 words of font info for 49 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 41i,7n,25p,1040b,225s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10
-.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/te
-xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmsy7.pfb>
-Output written on main.pdf (7 pages, 288279 bytes).
+ 41i,7n,25p,1040b,229s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy7.pfb>
+Output written on main.pdf (11 pages, 509049 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
- 51 compressed objects within 1 object stream
+ 92 PDF objects out of 1000 (max. 8388607)
+ 62 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

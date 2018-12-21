@@ -1,0 +1,12 @@
+\section{Eigenvalues}
+In order to implement the FHLL flux, it was necessary to compute the minimal and maximal eigenvalues of the jacobians of the left and right states. 
+\subsection{Nonrelativistic Case}
+In the nonrelativistic case, we can compute the minimal and maximumal eigenvalues of the left and right states in order to compute the numerical flux:
+$$\alpha^{\pm}=\max(0,\pm\lambda^{\pm}(\bm{U}^L),\pm\lambda^{\pm}(\bm{U}^R))$$
+For the nonrelativistic case, it can be shown that the minimal and maximal eigenvalues are given by:
+$$\lambda^{\pm}=v\pm c_s$$
+Where $c_s$ is the nonrelativistic sound speed. 
+\subsection{Relativistic Case}
+For the relativistic case in one dimension, the minimal and maximal eigenvalues correspond to their relativistic counterpart via the einstein summation formula:
+$$\lambda^{\pm}=\frac{v\pm c_s}{1\pm v c_s}$$
+

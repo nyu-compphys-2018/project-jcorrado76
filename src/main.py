@@ -24,7 +24,7 @@ def main():
     # nonrelativistic_parameters
 
     # SOD SHOCK TUBE 
-    params = nonrelativistic_parameters 
+    params =problem_1_relativistic_parameters 
     e.IC_manager.setSod( params=params )
     e.title += " {} Sod".format( params['title'] )
 
