@@ -1,5 +1,6 @@
 from prim_to_cons import prim_to_cons
 from numpy import where,sin,pi
+from sound_speed import get_sound_speed
 
 class Initial_Conditions( object ):
     def __init__( self , W , U , x ):
@@ -19,12 +20,14 @@ class Initial_Conditions( object ):
         self.W[2,:] = where( self.x <= x0 , params['p_l'] , params['p_r'] )
 
         self.U[:,:] = prim_to_cons( self.W , gamma )
-    def setIsentropicWave( self , rho0 , p0 , alpha , gamma , f , *args ):
+    def setIsentropicWave( self , params , f , *args ):
+        alpha = params['alpha'];gamma=params['gamma']
+        p0=params['p0'];rho0=params['rho0']
         initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** gamma
         cs = get_sound_speed(rho ,p,gamma)
-        v = (2. / (gamma-1.) ) * (cs - get_sound_speed(rho0,p0),gamma)
+        v = (2. / (gamma-1.) ) * (cs - get_sound_speed(rho0,p0,gamma))
 
         self.U[0,:] = rho
         self.U[1,:] = rho * v
@@ -32,7 +35,7 @@ class Initial_Conditions( object ):
         self.W[0,:] = rho
         self.W[1,:] = v
         self.W[2,:] = p
-        self.U[:,:] = prim_to_cons( self.W )
+        self.U[:,:] = prim_to_cons( self.W , gamma )
     def setSmoothWave( self ):
         self.W[0,:] = sin(2 * pi * self.x)+2.0
         self.W[1,:] = 0.0

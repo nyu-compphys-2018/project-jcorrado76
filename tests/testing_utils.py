@@ -15,9 +15,9 @@ CFL = 0.4
 N = 500
 
 def run_sod_test( parameters=None ):
-    if sys.argv[1] is not None:
+    try:
         order = sys.argv[1]
-    else:
+    except:
         order = 'low'
     if order == 'low':
         sod_plots_dir = plots_dir + "low_order_sod_shock_tube_plots/"
@@ -42,8 +42,13 @@ def run_sod_test( parameters=None ):
     save_string = sod_plots_dir + title + plot_extension
     plt.savefig( save_string , bbox_inches='tight',format='jpg',dpi=dpi)
 
-def run_isentropic_wave_test(order='low'):
+def run_isentropic_wave_test(parameters=None):
+    try:
+        order = sys.argv[1]
+    except:
+        order = 'low'
     bc='periodic'
+    # bc='outflow'
     if order == 'low':
         title = "LowOrderSpaceLowOrderTime"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,\
@@ -52,12 +57,13 @@ def run_isentropic_wave_test(order='low'):
         title = "ThirdOrderTimeSecondOrderSpace"
         e = EulerSolver( Nx=N , a=0.0 , b=1.0 , cfl=CFL,
                 time_order=3,spatial_order=2 , bc=bc)
-    rho0 = 1.0; p0 = 0.6; alpha = 0.2; x0=0.5; sigma=0.4
-    e.IC_manager.setIsentropicWave(rho0,p0,alpha,f,x0,sigma)
+    x0=0.5; sigma=0.4
+    e.IC_manager.setIsentropicWave(parameters , f,x0,sigma)
     title += "{}".format( "Isentropic Wave")
 
-    e.evolve( tfinal )
+    e.evolve( 0.8 )
     axes = e.plot(title=title)
 
-    save_string = plots_dir + title + plot_extension
+    isentropic_plots_dir = plots_dir + "isentropic_wave_plots/"
+    save_string = isentropic_plots_dir + title + plot_extension
     plt.savefig( save_string , bbox_inches='tight',format='jpg',dpi=dpi)

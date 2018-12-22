@@ -12,3 +12,5 @@ problem_3_relativistic_parameters = {"rho_l":1.0 ,"v_l":0.9 , "p_l":1.0,\
 nonrelativistic_parameters = {"rho_l":1.0 ,"v_l":0.0 , "p_l":1.0,\
                            "rho_r":0.125 ,   "v_r":0.0, "p_r":0.1 ,\
                            "gamma":1.4 , "title":"NonRelativisticSod" }
+
+isentropic_wave_parameters = {"rho0":1.0 , "p0":100. , "alpha":1.0,"gamma":5./3. }
