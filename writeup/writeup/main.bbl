@@ -1,0 +1,53 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{macfadyen}{article}{}
+      \name{author}{1}{}{%
+        {{hash=4f08ecccae05b71a66fd80344f06871d}{%
+           family={Weiqun\bibnamedelima Zhang},
+           familyi={W\bibinitperiod\bibinitdelim Z\bibinitperiod},
+           given={Andrew\bibnamedelima Macfadyen},
+           giveni={A\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{4f08ecccae05b71a66fd80344f06871d}
+      \strng{fullhash}{4f08ecccae05b71a66fd80344f06871d}
+      \strng{bibnamehash}{4f08ecccae05b71a66fd80344f06871d}
+      \strng{authorbibnamehash}{4f08ecccae05b71a66fd80344f06871d}
+      \strng{authornamehash}{4f08ecccae05b71a66fd80344f06871d}
+      \strng{authorfullhash}{4f08ecccae05b71a66fd80344f06871d}
+      \field{sortinit}{W}
+      \field{sortinithash}{ecb89ff85896a47dc313960773ac311d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Astrophysical Journal Supplement Series}
+      \field{number}{1}
+      \field{title}{RAM: A Relativistic Adaptive Mesh Refinement Hydrodynamics Code}
+      \field{volume}{215}
+      \field{pages}{5\bibrangedash 8}
+      \range{pages}{4}
+      \verb{doi}
+      \verb arXiv:astro-ph/0505481
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

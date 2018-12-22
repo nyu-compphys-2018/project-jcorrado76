@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 22:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 23:07
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -229,8 +229,6 @@ Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
 
 (/usr/share/texlive/texmf-dist/tex/latex/biblatex/blx-dm.def)
-Package biblatex Info: Trying to load biblatex style data model...
-Package biblatex Info: ... file 'alphabetic.dbx' not found.
 Package biblatex Info: Trying to load biblatex custom data model...
 Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
 \c@afterword=\count146
@@ -326,11 +324,11 @@ File: biblatex.def 2017/12/19 v3.10 biblatex compatibility (PK/JW/AB)
 \c@biburllcpenalty=\count285
 \c@smartand=\count286
 )
-Package biblatex Info: Trying to load bibliography style 'alphabetic'...
-Package biblatex Info: ... file 'alphabetic.bbx' found.
+Package biblatex Info: Trying to load bibliography style 'numeric'...
+Package biblatex Info: ... file 'numeric.bbx' found.
 
-(/usr/share/texlive/texmf-dist/tex/latex/biblatex/bbx/alphabetic.bbx
-File: alphabetic.bbx 2017/12/19 v3.10 biblatex bibliography style (PK/JW/AB)
+(/usr/share/texlive/texmf-dist/tex/latex/biblatex/bbx/numeric.bbx
+File: numeric.bbx 2017/12/19 v3.10 biblatex bibliography style (PK/JW/AB)
 Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
 
@@ -339,16 +337,17 @@ File: standard.bbx 2017/12/19 v3.10 biblatex bibliography style (PK/JW/AB)
 \c@bbx:relatedcount=\count287
 \c@bbx:relatedtotal=\count288
 ))
-Package biblatex Info: Trying to load citation style 'alphabetic'...
-Package biblatex Info: ... file 'alphabetic.cbx' found.
+Package biblatex Info: Trying to load citation style 'numeric'...
+Package biblatex Info: ... file 'numeric.cbx' found.
 
-(/usr/share/texlive/texmf-dist/tex/latex/biblatex/cbx/alphabetic.cbx
-File: alphabetic.cbx 2017/12/19 v3.10 biblatex citation style (PK/JW/AB)
+(/usr/share/texlive/texmf-dist/tex/latex/biblatex/cbx/numeric.cbx
+File: numeric.cbx 2017/12/19 v3.10 biblatex citation style (PK/JW/AB)
 Package biblatex Info: Redefining '\cite'.
 Package biblatex Info: Redefining '\parencite'.
 Package biblatex Info: Redefining '\footcite'.
 Package biblatex Info: Redefining '\footcitetext'.
 Package biblatex Info: Redefining '\smartcite'.
+Package biblatex Info: Redefining '\supercite'.
 Package biblatex Info: Redefining '\textcite'.
 Package biblatex Info: Redefining '\textcites'.
 Package biblatex Info: Redefining '\cites'.
@@ -392,18 +391,18 @@ File: english.lbx 2017/12/19 v3.10 biblatex localization (PK/JW/AB)
  (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
 Package biblatex Info: No input encoding detected.
 (biblatex)             Assuming 'ascii'.
 Package biblatex Info: Automatic encoding selection.
@@ -411,11 +410,11 @@ Package biblatex Info: Automatic encoding selection.
 \openout4 = `main.bcf'.
 
 Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'main.bbl' not found.
-No file main.bbl.
-Package biblatex Info: Reference section=0 on input line 13.
-Package biblatex Info: Reference segment=0 on input line 13.
-(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+Package biblatex Info: ... file 'main.bbl' found.
+(./main.bbl)
+Package biblatex Info: Reference section=0 on input line 14.
+Package biblatex Info: Reference segment=0 on input line 14.
+ (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count291
 \scratchdimen=\dimen114
@@ -522,11 +521,11 @@ visticSodProblem1.jpg>
 Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
 ceLowOrderTimeRelativisticSodProblem1.jpg  used on input line 18.
 (pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
+[12 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonrel
+ativisticSod.jpg> <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSe
+condOrderSpaceNonRelativisticSod.jpg>]
 <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
-tivisticSodProblem1.jpg, id=56, 2630.82875pt x 1926.19624pt>
+tivisticSodProblem1.jpg, id=59, 2630.82875pt x 1926.19624pt>
 File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
 eRelativisticSodProblem1.jpg Graphic file (type jpg)
 <use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
@@ -534,11 +533,8 @@ RelativisticSodProblem1.jpg>
 Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
 TimeSecondOrderSpaceRelativisticSodProblem1.jpg  used on input line 24.
 (pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativist
-icSodProblem2.jpg, id=57, 2461.195pt x 1926.19624pt>
+icSodProblem2.jpg, id=60, 2461.195pt x 1926.19624pt>
 File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
 ivisticSodProblem2.jpg Graphic file (type jpg)
 <use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelati
@@ -546,11 +542,11 @@ visticSodProblem2.jpg>
 Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
 ceLowOrderTimeRelativisticSodProblem2.jpg  used on input line 30.
 (pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
+ [13 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
+ivisticSodProblem1.jpg> <../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceRelativisticSodProblem1.jpg>]
 <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
-tivisticSodProblem2.jpg, id=58, 2630.82875pt x 1926.19624pt>
+tivisticSodProblem2.jpg, id=65, 2630.82875pt x 1926.19624pt>
 File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
 eRelativisticSodProblem2.jpg Graphic file (type jpg)
 <use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
@@ -558,11 +554,8 @@ RelativisticSodProblem2.jpg>
 Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
 TimeSecondOrderSpaceRelativisticSodProblem2.jpg  used on input line 36.
 (pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativist
-icSodProblem3.jpg, id=59, 2461.195pt x 1926.19624pt>
+icSodProblem3.jpg, id=66, 2461.195pt x 1926.19624pt>
 File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
 ivisticSodProblem3.jpg Graphic file (type jpg)
 <use ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelati
@@ -570,11 +563,11 @@ visticSodProblem3.jpg>
 Package pdftex.def Info: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpa
 ceLowOrderTimeRelativisticSodProblem3.jpg  used on input line 42.
 (pdftex.def)             Requested size: 246.13391pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
+ [14 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelat
+ivisticSodProblem2.jpg> <../../plots/high_order_sod_shock_tube_plots/ThirdOrder
+TimeSecondOrderSpaceRelativisticSodProblem2.jpg>]
 <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRela
-tivisticSodProblem3.jpg, id=60, 2630.82875pt x 1926.19624pt>
+tivisticSodProblem3.jpg, id=70, 2630.82875pt x 1926.19624pt>
 File: ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpac
 eRelativisticSodProblem3.jpg Graphic file (type jpg)
 <use ../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpace
@@ -582,52 +575,41 @@ RelativisticSodProblem3.jpg>
 Package pdftex.def Info: ../../plots/high_order_sod_shock_tube_plots/ThirdOrder
 TimeSecondOrderSpaceRelativisticSodProblem3.jpg  used on input line 48.
 (pdftex.def)             Requested size: 263.09828pt x 192.6309pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-) (./sections/bibliography.tex)
-
-LaTeX Warning: Empty bibliography on input line 2.
-
-[12 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonrel
-ativisticSod.jpg> <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSe
-condOrderSpaceNonRelativisticSod.jpg>] [13 <../../plots/low_order_sod_shock_tub
-e_plots/LowOrderSpaceLowOrderTimeRelativisticSodProblem1.jpg> <../../plots/high
-_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRelativisticSodProble
-m1.jpg>] [14 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderT
-imeRelativisticSodProblem2.jpg> <../../plots/high_order_sod_shock_tube_plots/Th
-irdOrderTimeSecondOrderSpaceRelativisticSodProblem2.jpg>] [15 <../../plots/low_
-order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativisticSodProblem3.jpg
-> <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRe
-lativisticSodProblem3.jpg>] (./main.aux)
+)
+(./sections/bibliography.tex [15 <../../plots/low_order_sod_shock_tube_plots/Lo
+wOrderSpaceLowOrderTimeRelativisticSodProblem3.jpg> <../../plots/high_order_sod
+_shock_tube_plots/ThirdOrderTimeSecondOrderSpaceRelativisticSodProblem3.jpg>])
+[16] (./main.aux)
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 8739 strings out of 494847
- 152262 string characters out of 6179079
- 549613 words of memory out of 5000000
- 11921 multiletter control sequences out of 15000+600000
- 13934 words of font info for 49 fonts, out of 8000000 for 9000
+ 8941 strings out of 494847
+ 156217 string characters out of 6179079
+ 549595 words of memory out of 5000000
+ 12119 multiletter control sequences out of 15000+600000
+ 14749 words of font info for 52 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 35i,7n,31p,1040b,742s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 35i,7n,45p,1040b,1152s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/font
-s/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pf
-b>
-Output written on main.pdf (15 pages, 3581875 bytes).
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on main.pdf (16 pages, 3613683 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 71 compressed objects within 1 object stream
+ 128 PDF objects out of 1000 (max. 8388607)
+ 82 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
