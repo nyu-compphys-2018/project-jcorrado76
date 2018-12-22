@@ -12,7 +12,7 @@ $$\bm{U}(x,t)=\begin{cases}
 \begin{figure}[h]
 		\centering
 		\includegraphics[scale=0.1]{HLLEFlux}
-		\caption{Spacetime control Volume for the computation of the approximate HLLE FLux}
+        \caption{Spacetime control Volume for the computation of the approximate HLLE FLux, \cite{rezzolla}}
 \end{figure}
 
 By applying the Rankine-Hugoniot conditions across the left and right waves, we can compute the constant state $\bm{U}^{HLLE}$, given that we know the signal speeds $\lambda_L$ and $\lambda_R$. Doing this, we obtain the HLLE flux:
@@ -47,7 +47,7 @@ For this solution, it is required an estimate for the speeds $\lambda_L$, $\lamb
 \begin{figure}[h]
 		\centering
 		\includegraphics[scale=0.15]{HLLCFluxSolver}
-		\caption{Spacetime control volume for the computation of approximate HLLC flux. This riemann fan is coposed of two waves with speeds $\lambda_L$ and $\lambda_R$ and an approximation to the contact discontinuity wave speed $\lambda_C$}
+        \caption{Spacetime control volume for the computation of approximate HLLC flux. This riemann fan is coposed of two waves with speeds $\lambda_L$ and $\lambda_R$ and an approximation to the contact discontinuity wave speed $\lambda_C$, \cite{rezzolla}}
 \end{figure}
 
 \subsection{My Code}

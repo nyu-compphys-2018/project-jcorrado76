@@ -19,6 +19,84 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
+    \entry{donmez}{article}{}
+      \name{author}{1}{}{%
+        {{hash=803a511049e838ce60d5e0ce366773eb}{%
+           family={Donmez},
+           familyi={D\bibinitperiod},
+           given={Orhan},
+           giveni={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{803a511049e838ce60d5e0ce366773eb}
+      \strng{fullhash}{803a511049e838ce60d5e0ce366773eb}
+      \strng{bibnamehash}{803a511049e838ce60d5e0ce366773eb}
+      \strng{authorbibnamehash}{803a511049e838ce60d5e0ce366773eb}
+      \strng{authornamehash}{803a511049e838ce60d5e0ce366773eb}
+      \strng{authorfullhash}{803a511049e838ce60d5e0ce366773eb}
+      \field{sortinit}{D}
+      \field{sortinithash}{2ef1bd9a78cc71eb74d7231c635177b8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Applied Mathematics and Computation}
+      \field{number}{1}
+      \field{title}{Solving 1-D special relativistic hydrodynamics (SRH) equations using different numerical methods and results from different test problems}
+      \field{volume}{181}
+      \verb{doi}
+      \verb https://doi.org/10.1016/j.amc.2006.01.031
+      \endverb
+    \endentry
+    \entry{marti}{article}{}
+      \name{author}{1}{}{%
+        {{hash=3e89b38c9b6e26e8bd57e78fa60e183c}{%
+           family={Jose\bibnamedelima Marti},
+           familyi={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+           given={Ewald\bibnamedelima Muller},
+           giveni={E\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \strng{fullhash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \strng{bibnamehash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \strng{authorbibnamehash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \strng{authornamehash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \strng{authorfullhash}{3e89b38c9b6e26e8bd57e78fa60e183c}
+      \field{sortinit}{J}
+      \field{sortinithash}{fce5f8d0bd05e8d93f3dbe21c78897ca}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Living Reviews in Relativity}
+      \field{number}{7}
+      \field{title}{Numerical Hydrodynamics in Special Relativity}
+      \field{volume}{6}
+      \field{pages}{73\bibrangedash 74}
+      \range{pages}{2}
+      \verb{doi}
+      \verb https://doi.org/10.12942/lrr-2003-7
+      \endverb
+    \endentry
+    \entry{rezzolla}{book}{}
+      \name{author}{1}{}{%
+        {{hash=848a239304a9d236e59b7ec2f4172a71}{%
+           family={Luciano\bibnamedelima Rezzolla},
+           familyi={L\bibinitperiod\bibinitdelim R\bibinitperiod},
+           given={Olindo\bibnamedelima Zanotti},
+           giveni={O\bibinitperiod\bibinitdelim Z\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Oxford University Press}%
+      }
+      \strng{namehash}{848a239304a9d236e59b7ec2f4172a71}
+      \strng{fullhash}{848a239304a9d236e59b7ec2f4172a71}
+      \strng{bibnamehash}{848a239304a9d236e59b7ec2f4172a71}
+      \strng{authorbibnamehash}{848a239304a9d236e59b7ec2f4172a71}
+      \strng{authornamehash}{848a239304a9d236e59b7ec2f4172a71}
+      \strng{authorfullhash}{848a239304a9d236e59b7ec2f4172a71}
+      \field{sortinit}{L}
+      \field{sortinithash}{2c7981aaabc885868aba60f0c09ee20f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Relativistic Hydrodynamics}
+      \field{year}{2013}
+    \endentry
     \entry{macfadyen}{article}{}
       \name{author}{1}{}{%
         {{hash=4f08ecccae05b71a66fd80344f06871d}{%

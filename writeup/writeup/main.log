@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 23:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 23:29
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -585,13 +585,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 8941 strings out of 494847
- 156217 string characters out of 6179079
- 549595 words of memory out of 5000000
- 12119 multiletter control sequences out of 15000+600000
+ 8949 strings out of 494847
+ 156483 string characters out of 6179079
+ 549765 words of memory out of 5000000
+ 12127 multiletter control sequences out of 15000+600000
  14749 words of font info for 52 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 35i,7n,45p,1040b,1152s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,7n,45p,1003b,1250s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
@@ -606,7 +606,7 @@ cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (16 pages, 3613683 bytes).
+Output written on main.pdf (16 pages, 3618807 bytes).
 PDF statistics:
  128 PDF objects out of 1000 (max. 8388607)
  82 compressed objects within 1 object stream
