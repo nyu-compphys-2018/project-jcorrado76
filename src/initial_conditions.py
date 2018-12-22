@@ -20,7 +20,7 @@ class Initial_Conditions( object ):
 
         self.U[:,:] = prim_to_cons( self.W , gamma )
     def setIsentropicWave( self , rho0 , p0 , alpha , gamma , f , *args ):
-        initial_wave = f( x , *args )
+        initial_wave = f( self.x , *args )
         rho = rho0 * (1.0 + alpha * initial_wave)
         p = p0 * ( rho / rho0 ) ** gamma
         cs = get_sound_speed(rho ,p,gamma)
@@ -38,4 +38,3 @@ class Initial_Conditions( object ):
         self.W[1,:] = 0.0
         self.W[2,:] = 1.0
         self.U[:,:] = prim_to_cons( self.W )
-

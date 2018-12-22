@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 18:10
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.12.13)  21 DEC 2018 20:50
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -256,7 +256,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 15--17
 
  []
 
-[10]) (./sections/modularity.tex) (./sections/test_cases.tex [11]
+[10]) (./sections/modularity.tex) (./sections/future_goals.tex)
+(./sections/test_cases.tex [11]
 <../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonrelativ
 isticSod.jpg, id=53, 3700.82625pt x 1926.19624pt>
 File: ../../plots/low_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeNonre
@@ -367,8 +368,8 @@ w_order_sod_shock_tube_plots/LowOrderSpaceLowOrderTimeRelativisticSodProblem3.j
 pg>] [16 <../../plots/high_order_sod_shock_tube_plots/ThirdOrderTimeSecondOrder
 SpaceRelativisticSodProblem3.jpg>] (./main.aux) ) 
 Here is how much of TeX's memory you used:
- 2384 strings out of 494847
- 35364 string characters out of 6179079
+ 2387 strings out of 494847
+ 35428 string characters out of 6179079
  90026 words of memory out of 5000000
  5627 multiletter control sequences out of 15000+600000
  13934 words of font info for 49 fonts, out of 8000000 for 9000
@@ -386,7 +387,7 @@ usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texl
 ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on main.pdf (16 pages, 3582055 bytes).
+Output written on main.pdf (16 pages, 3582367 bytes).
 PDF statistics:
  116 PDF objects out of 1000 (max. 8388607)
  73 compressed objects within 1 object stream
